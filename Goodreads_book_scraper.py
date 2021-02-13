@@ -32,7 +32,7 @@ import re
 import time
 import random
 
-ROOT_BOOK_URL = "https://www.goodreads.com/book/show/"
+ROOT_BOOK_URL = "http://www.goodreads.com/book/show/"
 
 
 def date_from_text(date_text):
@@ -60,6 +60,11 @@ def get_title(book_page_soup):
     return elems[0].text.strip()
 
 
+def get_format(book_page_soup):
+    elem = book_page_soup.find('span', {'itemprop':'bookFormat'})
+    return elem.text
+
+
 def get_series(book_page_soup):
     selector = '#bookSeries > a'
     elems = book_page_soup.select(selector)
@@ -75,7 +80,8 @@ def get_num_in_series(book_page_soup):
     if len(elems) == 0:
         return None
     else:
-        return float(elems[0].text.strip().strip('()').split('#')[1])
+        # return as float as some novellas (small add-on books) are number 1.5 or 2.5 or 3.5 etc in a series.
+        return elems[0].text.strip().strip('()').split('#')[1]
 
 
 def get_author(book_page_soup):
@@ -151,7 +157,7 @@ def book_scraper(Book_ID, proxy_address=None):
     if proxy_address == None:
         book_page = requests.get(url)
     else:
-        proxies = {'http': 'http://'+proxy_address, 'https': 'https://'+proxy_address}
+        proxies = {'http': proxy_address}
         book_page = requests.get(url, headers=headers, timeout=30)#, proxies=proxies, )
     try:
         book_page.raise_for_status()
@@ -164,6 +170,7 @@ def book_scraper(Book_ID, proxy_address=None):
         'Book_ID'] = Book_ID  # keep as string for convenience of use and in case leading zeros make a difference e.g. there may be book 5598 and book 05598
     book_data['Title'] = get_title(book_page_soup)
     book_data['Author'] = get_author(book_page_soup)
+    book_data['Format'] = get_format(book_page_soup)
     book_data['Series'] = get_series(book_page_soup)
     book_data['Number_in_series'] = get_num_in_series(book_page_soup)
     book_data['Rating'] = get_rating(book_page_soup)
@@ -176,12 +183,9 @@ def book_scraper(Book_ID, proxy_address=None):
 
     book_data['Scrape_datetime'] = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
 
-    book_data['Description'] = get_description(book_page_soup)
+    # book_data['Description'] = get_description(book_page_soup)
 
-    # TODO: remaining attributes:
-    # Date of last review
-    # edition (hardcover etc)
-    time.sleep(5+random.randint(0,1)) # to avoid timeout
+    time.sleep(10+random.randint(0,1)) # to avoid throttling
     return book_data
 
 
