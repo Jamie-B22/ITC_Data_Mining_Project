@@ -28,9 +28,25 @@ Author: Jamie Bamforth
 import requests
 import bs4
 from datetime import datetime
+import re
 
 ROOT_BOOK_URL = "https://www.goodreads.com/book/show/"
 
+
+def date_from_text(date_text):
+    day_pattern = re.compile(r'\b[0-9]{1,2}[a-zA-Z][a-zA-Z]\b')
+    month_pattern = re.compile(
+        "(jan(uary)?|feb(ruary)?|mar(ch)?|apr(il)?|may|jun(e)?|jul(y)?|aug(ust)?|sep(tember)?|oct(ober)?|nov(ember)?|dec(ember)?)")
+    year_pattern = re.compile(r'[0-9]{4}')
+
+    day = day_pattern.search(date_text)
+    month = month_pattern.search(date_text.lower()).group().title()
+    year = year_pattern.search(date_text).group()
+    if day == None:
+        return datetime.strptime(' '.join([month, year]), '%B %Y').strftime('%Y-%m')
+    else:
+        day = re.sub('[a-zA-Z]', '', day.group()) # remove suffix from day to leve number
+        return datetime.strptime(' '.join([day, month, year]), '%d %B %Y').strftime('%Y-%m-%d')
 
 def get_title(book_page_soup):
     selector = '#bookTitle'
@@ -68,30 +84,24 @@ def get_rating(book_page_soup):
     return float(elems[0].text.strip())
 
 
-def get_release_date(book_page_soup): # TODO: use regex to extract date and also check wether it has a first published. e.g. 186074 and 55361205
+def get_release_date(
+        book_page_soup):  # TODO: use regex to extract date and also check wether it has a first published. e.g. 186074 and 55361205
     elems = book_page_soup.find('div', {'id': 'details'}).find_all('div')
     release_date_row = 1
-    start_date_word = 1
-    end_date_word = 3
-    date_list = elems[release_date_row].text.strip().split()[start_date_word:end_date_word+1]
-    day = date_list[1][:-2]
-    month = date_list[0]
-    year = date_list[2]
-    return datetime.strptime(' '.join([day, month, year]), '%d %B %Y').strftime('%Y-%m-%d')
+    release_date_line = 2
+    date_text = elems[release_date_row].text.split('\n')[release_date_line] # excludes first publised date if exists
+    return date_from_text(date_text)
 
-def get_first_published_date(book_page_soup): # TODO: use regex to extract date and also check wether it has a first published. e.g. 186074 and 55361205
+
+def get_first_published_date(
+        book_page_soup):  # TODO: use regex to extract date and also check wether it has a first published. e.g. 186074 and 55361205
     elem = book_page_soup.find('div', {'id': 'details'}).find('nobr')
 
     # if only on release of a book, on first published date will exist
     if elem == None:
         return None
     else:
-        date_list = elem.text.strip().strip('()').split()[2:]
-        day = date_list[1][:-2]
-        month = date_list[0]
-        year = date_list[2]
-        return datetime.strptime(' '.join([day, month, year]), '%d %B %Y').strftime('%Y-%m-%d')
-
+        return date_from_text(elem.text)
 
 def get_num_ratings(book_page_soup):
     elem = book_page_soup.find('meta', {'itemprop': 'ratingCount'})
@@ -120,11 +130,10 @@ def get_num_pages(book_page_soup):
 
 
 def get_genre(book_page_soup):
-    selector = 'body > div.content > div.mainContentContainer > div.mainContent > div.mainContentFloat > div.rightContainer > div:nth-child(7) > div > div.bigBoxBody > div > div:nth-child(1) > div.left > a'
-    elems = book_page_soup.select(selector)
-    return elems[0].text.strip()
-# body > div.content > div.mainContentContainer > div.mainContent > div.mainContentFloat > div.rightContainer > div:nth-child(6) > div > div.bigBoxBody > div > div:nth-child(1) > div.left > a
-# body > div.content > div.mainContentContainer > div.mainContent > div.mainContentFloat > div.rightContainer > div:nth-child(7) > div > div.bigBoxBody > div > div:nth-child(1) > div.left > a
+    elems = book_page_soup.find_all('a', {'class': 'actionLinkLite bookPageGenreLink'})
+    genre_word_in_href = -1
+    genres = {elem['href'].split('/')[genre_word_in_href] for elem in elems}  # TODO: could extract as genre > sub genre
+    return genres
 
 
 def book_scraper(Book_ID, proxy_address=None):
@@ -155,28 +164,25 @@ def book_scraper(Book_ID, proxy_address=None):
     book_data['Qty_ratings'] = get_num_ratings(book_page_soup)
     book_data['Qty_reviews'] = get_num_reviews(book_page_soup)
     book_data['Qty_pages'] = get_num_pages(book_page_soup)
+    book_data['Genres'] = get_genre(book_page_soup)
 
     book_data['Scrape_datetime'] = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
 
     book_data['Description'] = get_description(book_page_soup)
-    # book_data['Genres'] = get_genre(book_page_soup)
 
     # TODO: remaining attributes:
-    # Genre
     # Date of review
-    # Genres (user shelves)
 
     return book_data
 
 
 def main():
-    # print(book_scraper('186074'))
-    # print(book_scraper('72193'))
+    print(book_scraper('186074'))
+    print(book_scraper('72193'))
     print(book_scraper('1'))
-    # print(book_scraper('77203'))
-    # print(book_scraper('55361205'))
+    print(book_scraper('77203'))
+    print(book_scraper('55361205'))
     print(book_scraper('53179303'))
-
 
 
 if __name__ == '__main__':
