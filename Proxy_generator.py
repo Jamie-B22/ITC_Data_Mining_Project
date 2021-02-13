@@ -20,13 +20,14 @@ def proxy_generator():
     ip_entry = 0
     port_entry = 1
     proxy_rows_split = [proxy.find_all('td')[:port_entry+1] for proxy in proxy_table[first_data_row:empty_row]]
-    proxy_IP_ports= ['https://'+proxy[ip_entry].text+'.'+proxy[port_entry].text for proxy in proxy_rows_split]
+    proxy_IP_ports= [proxy[ip_entry].text+':'+proxy[port_entry].text for proxy in proxy_rows_split]
     return proxy_IP_ports
 
 
 def main():
     # no way to test for specific proxies as they may change
-    print(proxy_generator())
+    proxies = proxy_generator()
+    print(proxies)
 
 
 

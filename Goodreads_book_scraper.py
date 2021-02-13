@@ -111,12 +111,16 @@ def get_genre(book_page_soup):
     return elems[0].text.strip()
 # body > div.content > div.mainContentContainer > div.mainContent > div.mainContentFloat > div.rightContainer > div:nth-child(6) > div > div.bigBoxBody > div > div:nth-child(1) > div.left > a
 # body > div.content > div.mainContentContainer > div.mainContent > div.mainContentFloat > div.rightContainer > div:nth-child(7) > div > div.bigBoxBody > div > div:nth-child(1) > div.left > a
-def book_scraper(Book_ID):
+def book_scraper(Book_ID, proxy_address=None):
     print(f'Scraping book {Book_ID}')
     book_data = dict()
     url = ROOT_BOOK_URL + Book_ID
-    book_page = requests.get(url)
-    print(book_page.text[:100]) # TODO: remove, inserted to chek for throttling, throttling produces: 'This is a random-length HTML comment: hjraensvmveqvhldamygurofeqknptieddzvdcdrgoksqskglcfdiglk'
+    if proxy_address == None:
+        book_page = requests.get(url)
+    else:
+        proxies = {'http': 'http://' + proxy_address}
+        book_page = requests.get(url, proxies=proxies)
+    # print(book_page.text[:100]) # TODO: remove, inserted to chek for throttling, throttling produces: 'This is a random-length HTML comment: hjraensvmveqvhldamygurofeqknptieddzvdcdrgoksqskglcfdiglk'
     # TODO: check if throttled and introduce a minute's wait and print 'being throttled, please wait 1 min'
     try:
         book_page.raise_for_status()
