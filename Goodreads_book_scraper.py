@@ -5,7 +5,6 @@ Series
 Rating
 Release date
 Unique ID
-Genre
 Author
 Number of ratings and reviews
 Description
@@ -28,7 +27,6 @@ Author: Jamie Bamforth
 
 import requests
 import bs4
-import time
 from datetime import datetime
 
 ROOT_BOOK_URL = "https://www.goodreads.com/book/show/"
@@ -71,26 +69,38 @@ def get_rating(book_page_soup):
 
 
 def get_release_date(book_page_soup): # TODO: use regex to extract date and also check wether it has a first published. e.g. 186074 and 55361205
-    selector = '#details > div:nth-child(2) > nobr' # only when " first published..."
-    # selector = '#details > div:nth-child(2)' # in all books
-    elems = book_page_soup.select(selector)
-    date_list = elems[0].text.strip().strip('()').split()[2:]
+    elems = book_page_soup.find('div', {'id': 'details'}).find_all('div')
+    release_date_row = 1
+    start_date_word = 1
+    end_date_word = 3
+    date_list = elems[release_date_row].text.strip().split()[start_date_word:end_date_word+1]
     day = date_list[1][:-2]
     month = date_list[0]
     year = date_list[2]
     return datetime.strptime(' '.join([day, month, year]), '%d %B %Y').strftime('%Y-%m-%d')
 
+def get_first_published_date(book_page_soup): # TODO: use regex to extract date and also check wether it has a first published. e.g. 186074 and 55361205
+    elem = book_page_soup.find('div', {'id': 'details'}).find('nobr')
+
+    # if only on release of a book, on first published date will exist
+    if elem == None:
+        return None
+    else:
+        date_list = elem.text.strip().strip('()').split()[2:]
+        day = date_list[1][:-2]
+        month = date_list[0]
+        year = date_list[2]
+        return datetime.strptime(' '.join([day, month, year]), '%d %B %Y').strftime('%Y-%m-%d')
+
 
 def get_num_ratings(book_page_soup):
-    selector = '#bookMeta > a:nth-child(7)'
-    elems = book_page_soup.select(selector)
-    return int(elems[0].text.strip().split()[0].replace(',', ''))
+    elem = book_page_soup.find('meta', {'itemprop': 'ratingCount'})
+    return int(elem['content'])
 
 
 def get_num_reviews(book_page_soup):
-    selector = '#bookMeta > a:nth-child(9)'
-    elems = book_page_soup.select(selector)
-    return int(elems[0].text.strip().split()[0].replace(',', ''))
+    elem = book_page_soup.find('meta', {'itemprop': 'reviewCount'})
+    return int(elem['content'])
 
 
 def get_description(book_page_soup):
@@ -100,9 +110,13 @@ def get_description(book_page_soup):
 
 
 def get_num_pages(book_page_soup):
-    selector = '#details > div:nth-child(1) > span:last-child'
-    elems = book_page_soup.select(selector)
-    return int(elems[0].text.split()[0])
+    elem = book_page_soup.find('span', {'itemprop': 'numberOfPages'})
+
+    # some books don't have any page number info, e.g. https://www.goodreads.com/book/show/53179303-this-time-next-year-we-ll-be-laughing
+    if elem == None:
+        return elem
+    else:
+        return int(elem.text.split()[0])
 
 
 def get_genre(book_page_soup):
@@ -111,6 +125,8 @@ def get_genre(book_page_soup):
     return elems[0].text.strip()
 # body > div.content > div.mainContentContainer > div.mainContent > div.mainContentFloat > div.rightContainer > div:nth-child(6) > div > div.bigBoxBody > div > div:nth-child(1) > div.left > a
 # body > div.content > div.mainContentContainer > div.mainContent > div.mainContentFloat > div.rightContainer > div:nth-child(7) > div > div.bigBoxBody > div > div:nth-child(1) > div.left > a
+
+
 def book_scraper(Book_ID, proxy_address=None):
     print(f'Scraping book {Book_ID}')
     book_data = dict()
@@ -120,8 +136,6 @@ def book_scraper(Book_ID, proxy_address=None):
     else:
         proxies = {'http': 'http://' + proxy_address}
         book_page = requests.get(url, proxies=proxies)
-    # print(book_page.text[:100]) # TODO: remove, inserted to chek for throttling, throttling produces: 'This is a random-length HTML comment: hjraensvmveqvhldamygurofeqknptieddzvdcdrgoksqskglcfdiglk'
-    # TODO: check if throttled and introduce a minute's wait and print 'being throttled, please wait 1 min'
     try:
         book_page.raise_for_status()
     except:  # TODO: raise an error here?
@@ -136,7 +150,8 @@ def book_scraper(Book_ID, proxy_address=None):
     book_data['Series'] = get_series(book_page_soup)
     book_data['Number_in_series'] = get_num_in_series(book_page_soup)
     book_data['Rating'] = get_rating(book_page_soup)
-    #book_data['Release_date'] = get_release_date(book_page_soup)
+    book_data['Release_date'] = get_release_date(book_page_soup)
+    book_data['First_published_date'] = get_first_published_date(book_page_soup)
     book_data['Qty_ratings'] = get_num_ratings(book_page_soup)
     book_data['Qty_reviews'] = get_num_reviews(book_page_soup)
     book_data['Qty_pages'] = get_num_pages(book_page_soup)
@@ -155,11 +170,12 @@ def book_scraper(Book_ID, proxy_address=None):
 
 
 def main():
-    print(book_scraper('186074'))
-    print(book_scraper('72193'))
+    # print(book_scraper('186074'))
+    # print(book_scraper('72193'))
     print(book_scraper('1'))
-    print(book_scraper('77203'))
-    print(book_scraper('55361205'))
+    # print(book_scraper('77203'))
+    # print(book_scraper('55361205'))
+    print(book_scraper('53179303'))
 
 
 
