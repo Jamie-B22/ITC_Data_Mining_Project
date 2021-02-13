@@ -9,13 +9,18 @@ import bs4
 
 
 
+
 def list_scraper(list_url, proxy_address=None):
     print(f'Scraping list {list_url}')
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36'
+    }
+
     if proxy_address == None:
         list_page = requests.get(list_url)
     else:
-        proxies = {'http': 'http://' + proxy_address}
-        list_page = requests.get(list_url, proxies=proxies)
+        proxies = {'http': 'http://'+proxy_address, 'https': 'https://'+proxy_address}
+        list_page = requests.get(list_url, headers=headers, timeout=30)#, proxies=proxies)
     try:
         list_page.raise_for_status()
     except:  # TODO: raise an error here?

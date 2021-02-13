@@ -29,6 +29,7 @@ import requests
 import bs4
 from datetime import datetime
 import re
+import time
 
 ROOT_BOOK_URL = "https://www.goodreads.com/book/show/"
 
@@ -84,8 +85,7 @@ def get_rating(book_page_soup):
     return float(elems[0].text.strip())
 
 
-def get_release_date(
-        book_page_soup):  # TODO: use regex to extract date and also check wether it has a first published. e.g. 186074 and 55361205
+def get_release_date(book_page_soup):
     elems = book_page_soup.find('div', {'id': 'details'}).find_all('div')
     release_date_row = 1
     release_date_line = 2
@@ -93,8 +93,7 @@ def get_release_date(
     return date_from_text(date_text)
 
 
-def get_first_published_date(
-        book_page_soup):  # TODO: use regex to extract date and also check wether it has a first published. e.g. 186074 and 55361205
+def get_first_published_date(book_page_soup):
     elem = book_page_soup.find('div', {'id': 'details'}).find('nobr')
 
     # if only on release of a book, on first published date will exist
@@ -140,11 +139,15 @@ def book_scraper(Book_ID, proxy_address=None):
     print(f'Scraping book {Book_ID}')
     book_data = dict()
     url = ROOT_BOOK_URL + Book_ID
+    headers = {
+        'User-Agent':
+            'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36',
+    }
     if proxy_address == None:
         book_page = requests.get(url)
     else:
-        proxies = {'http': 'http://' + proxy_address}
-        book_page = requests.get(url, proxies=proxies)
+        proxies = {'http': 'http://'+proxy_address, 'https': 'https://'+proxy_address}
+        book_page = requests.get(url, headers=headers, timeout=30)#, proxies=proxies, )
     try:
         book_page.raise_for_status()
     except:  # TODO: raise an error here?
@@ -172,7 +175,7 @@ def book_scraper(Book_ID, proxy_address=None):
 
     # TODO: remaining attributes:
     # Date of review
-
+    time.sleep(10) # to avoid timeout
     return book_data
 
 
