@@ -6,6 +6,8 @@ Author: Jamie Bamforth
 
 import requests
 import bs4
+import time
+import random
 
 
 
@@ -31,11 +33,13 @@ def list_scraper(list_url, proxy_address=None):
     # book ID may be followed by either . or -
     book_ID_list = [title['href'].split('/')[-1].split('.')[0].split('-')[0] for title in titles]
 
+    time.sleep(5+random.randint(0,1)) # to prevent throttling
     return book_ID_list
 
 
 def main():
     print(list_scraper('https://www.goodreads.com/book/popular_by_date/2020/11', '139.99.102.114:80'))
+    # print(list_scraper('https://www.goodreads.com/genres/new_releases/fiction', '139.99.102.114:80'))
 
 
 

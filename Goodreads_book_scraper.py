@@ -30,6 +30,7 @@ import bs4
 from datetime import datetime
 import re
 import time
+import random
 
 ROOT_BOOK_URL = "https://www.goodreads.com/book/show/"
 
@@ -41,12 +42,16 @@ def date_from_text(date_text):
     year_pattern = re.compile(r'[0-9]{4}')
 
     day = day_pattern.search(date_text)
-    month = month_pattern.search(date_text.lower()).group().title()
+    month = month_pattern.search(date_text.lower())
     year = year_pattern.search(date_text).group()
-    if day == None:
+    if month == None:
+        return year
+    elif day == None:
+        month = month.group().title()
         return datetime.strptime(' '.join([month, year]), '%B %Y').strftime('%Y-%m')
     else:
         day = re.sub('[a-zA-Z]', '', day.group()) # remove suffix from day to leve number
+        month = month.group().title()
         return datetime.strptime(' '.join([day, month, year]), '%d %B %Y').strftime('%Y-%m-%d')
 
 def get_title(book_page_soup):
@@ -123,7 +128,7 @@ def get_num_pages(book_page_soup):
 
     # some books don't have any page number info, e.g. https://www.goodreads.com/book/show/53179303-this-time-next-year-we-ll-be-laughing
     if elem == None:
-        return elem
+        return None
     else:
         return int(elem.text.split()[0])
 
@@ -174,8 +179,9 @@ def book_scraper(Book_ID, proxy_address=None):
     book_data['Description'] = get_description(book_page_soup)
 
     # TODO: remaining attributes:
-    # Date of review
-    time.sleep(10) # to avoid timeout
+    # Date of last review
+    # edition (hardcover etc)
+    time.sleep(5+random.randint(0,1)) # to avoid timeout
     return book_data
 
 
@@ -186,6 +192,7 @@ def main():
     print(book_scraper('77203'))
     print(book_scraper('55361205'))
     print(book_scraper('53179303'))
+    print(book_scraper('48764258'))
 
 
 if __name__ == '__main__':
