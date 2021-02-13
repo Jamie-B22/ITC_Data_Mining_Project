@@ -151,7 +151,6 @@ def book_scraper(Book_ID, proxy_address=None):
     # Date of review
     # Genres (user shelves)
 
-    time.sleep(5) # to prevent throttling # TODO: really needed?
     return book_data
 
 

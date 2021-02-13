@@ -27,7 +27,6 @@ def list_scraper(list_url, proxy_address=None):
     # book ID may be followed by either . or -
     book_ID_list = [title['href'].split('/')[-1].split('.')[0].split('-')[0] for title in titles]
 
-    time.sleep(5) # to prevent throttling # TODO: really needed?
     return book_ID_list
 
 
