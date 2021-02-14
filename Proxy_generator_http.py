@@ -21,7 +21,7 @@ def proxy_generator_http():
     ip_entry = 0
     port_entry = 1
     proxy_rows_split = [proxy.find_all('td')[:port_entry + 1] for proxy in proxy_table[first_data_row:empty_row]]
-    proxy_IP_ports = ['http://' + proxy[ip_entry].text + ':' + proxy[port_entry].text for proxy in proxy_rows_split]
+    proxy_IP_ports = [proxy[ip_entry].text + ':' + proxy[port_entry].text for proxy in proxy_rows_split]
     return proxy_IP_ports
 
 
