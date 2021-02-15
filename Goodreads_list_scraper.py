@@ -35,6 +35,7 @@ def list_scraper(list_url, proxy_address=None):
 
     list_page_soup = bs4.BeautifulSoup(list_page.text, 'html.parser')
 
+    # TODO: need and elif for https://www.goodreads.com/list/, e.g. https://www.goodreads.com/list/show/158045.Thinking_with_the_Heart
     if "goodreads.com/book/" in list_url:       # most read and most popular list start with this URL
         titles = list_page_soup.find_all("a", {"class": "bookTitle"})
         # book ID may be followed by either . or -
