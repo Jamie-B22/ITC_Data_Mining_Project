@@ -13,6 +13,10 @@ import random
 
 
 def list_scraper(list_url, proxy_address=None):
+    """
+    Takes a URL for the most read, most popular or new releases lists on Goodreads and returns a list of the book IDs in the list
+    Optional parameter for a proxy address if there have been too many requests and the scraping is throttled
+    """
     print(f'Scraping list {list_url}')
 
     headers = {
@@ -30,9 +34,15 @@ def list_scraper(list_url, proxy_address=None):
         print(f'Failed to scrape {list_url}')
 
     list_page_soup = bs4.BeautifulSoup(list_page.text, 'html.parser')
-    titles = list_page_soup.find_all("a", {"class": "bookTitle"})
-    # book ID may be followed by either . or -
-    book_ID_list = [title['href'].split('/')[-1].split('.')[0].split('-')[0] for title in titles]
+
+    if "goodreads.com/book/" in list_url:       # most read and most popular list start with this URL
+        titles = list_page_soup.find_all("a", {"class": "bookTitle"})
+        # book ID may be followed by either . or -
+        book_ID_list = [title['href'].split('/')[-1].split('.')[0].split('-')[0] for title in titles]
+    else:
+        titles = list_page_soup.find_all("div", {"class": "coverWrapper"})
+        # book ID is contained at the end of the thumbnail ID, delimited by _
+        book_ID_list = [title['id'].rsplit('_')[-1] for title in titles]
 
     time.sleep(10+random.randint(0,1)) # to prevent throttling
     return book_ID_list
