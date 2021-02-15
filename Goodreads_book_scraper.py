@@ -29,6 +29,13 @@ import random
 # Constant url root to which the unique Goodreads ID of a book is appended to access the Goodreads page for that book
 ROOT_BOOK_URL = "http://www.goodreads.com/book/show/"
 
+ANTI_THROTTLE_DELAY_S = 10
+RELEASE_DATE_ELEMENT_ROW = 1
+RELEASE_DATE_TEXT_LINE = 2
+PAGES_WORD_INDEX_IN_TEXT = 0
+THROTTLING_STATUS_CODE = 403
+
+
 
 def date_from_text(date_text):
     """Takes a string with the components of the date existing somewhere in the string and returns the date string in
@@ -114,9 +121,7 @@ def get_rating(book_page_soup):
 def get_release_date(book_page_soup):
     """Takes the HTML Beautiful Soup object of a Goodreads book page and returns release date as a string."""
     elems = book_page_soup.find('div', {'id': 'details'}).find_all('div')
-    release_date_row = 1
-    release_date_line = 2
-    date_text = elems[release_date_row].text.split('\n')[release_date_line]  # excludes first publised date if exists
+    date_text = elems[RELEASE_DATE_ELEMENT_ROW].text.split('\n')[RELEASE_DATE_TEXT_LINE]  # excludes first publised date if exists
     return date_from_text(date_text)
 
 
@@ -159,7 +164,7 @@ def get_num_pages(book_page_soup):
     if elem == None:
         return None
     else:
-        return int(elem.text.split()[0])
+        return int(elem.text.split()[PAGES_WORD_INDEX_IN_TEXT])
 
 
 def get_genre(book_page_soup):
@@ -167,7 +172,7 @@ def get_genre(book_page_soup):
     allocated it to on Goodreads as a set of strings."""
     elems = book_page_soup.find_all('a', {'class': 'actionLinkLite bookPageGenreLink'})
     genre_word_in_href = -1
-    genres = {elem['href'].split('/')[genre_word_in_href] for elem in elems}  # TODO: could extract as genre > sub genre
+    genres = {elem['href'].split('/')[genre_word_in_href] for elem in elems}
     return genres
 
 
@@ -182,14 +187,10 @@ def request_book_page_html(Book_ID, proxy_address):
         'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36',
         'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.71 Safari/537.36']
     headers = {"user-agent": random.choice(headers_list)}
-    if proxy_address == None:
-        book_page = requests.get(url)
-    else:
-        proxies = {'http': 'http://' + proxy_address, 'https': 'https://' + proxy_address}
-        book_page = requests.get(url, headers=headers,
-                                 timeout=30)  # , proxies=proxies, ) # TODO: test proxies on Jordan's computer
+    book_page = requests.get(url, headers=headers)
+
     if book_page.status_code >= 300:
-        if book_page.status_code == 403:
+        if book_page.status_code == THROTTLING_STATUS_CODE:
             raise ConnectionError(f'Throttled by Goodreads. Failure of request to url {url}. Status code: {book_page.status_code} Error')
         else:
             raise ConnectionError(f'Failure of request to url {url}. Status code: {book_page.status_code} Error')
@@ -230,7 +231,7 @@ def book_scraper(Book_ID, proxy_address=None):
     book_page_soup = bs4.BeautifulSoup(book_page.text, 'html.parser')
     book_data = parse_page_html(Book_ID, book_page_soup)
 
-    time.sleep(10 + random.randint(0, 1))  # to avoid throttling, 9s wasn't enough
+    time.sleep(ANTI_THROTTLE_DELAY_S + random.randint(0, 1))  # to avoid throttling, 9s wasn't enough
     return book_data
 
 
@@ -273,27 +274,12 @@ def tests():
     assert book_data['First_published_date'] == '2002'
     assert book_data['Qty_pages'] == 467
 
-    # print(book_data['Book_ID'])
-    # print(book_data['Title'])
-    # print(book_data['Author'])
-    # print(book_data['Format'])
-    # print(book_data['Series'])
-    # print(book_data['Number_in_series'])
-    # print(book_data['Release_date'])
-    # print(book_data['First_published_date'])
-    # print(book_data['Qty_pages'])
     print('book_scraper() tests successful')
+
 
 def main():
     """Runs tests()"""
     tests()
-    # print(book_scraper('186074'))
-    # print(book_scraper('72193'))
-    # print(book_scraper('1'))
-    # print(book_scraper('77203'))
-    # print(book_scraper('55361205'))
-    # print(book_scraper('53179303'))
-    # print(book_scraper('48764258'))
 
 
 if __name__ == '__main__':
