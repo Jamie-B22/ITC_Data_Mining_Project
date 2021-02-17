@@ -8,7 +8,7 @@ import csv
 OUTPUT_FILE_NAME = 'book_data.csv'
 
 
-def scrape_books_from_list(book_id_list):
+def scrape_books_from_list(book_ID_list):
     """Take a list of Goodreads book IDs and scrape the data from the book webpages. Return a list of Book_Record
     objects that contain the scraped data."""
     book_data = []
