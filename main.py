@@ -5,7 +5,7 @@ import time
 import csv
 
 
-OUTPUT_FILE_NAME = 'book_data.csv'
+OUTPUT_FILE_NAME = '20210218_book_data.csv'
 
 
 def scrape_books_from_list(book_ID_list):
@@ -19,13 +19,14 @@ def scrape_books_from_list(book_ID_list):
             print(book_data[-1].__dict__)
     except ConnectionError as err:
         print(f'Failure to scrape book. {err}')
+    return book_data
 
 
 def write_to_csv(book_data):
     """Take a list of Book_Record objects and save each Book_record as a row in a CSV."""
     print(f'Saving scraped data in {OUTPUT_FILE_NAME}.')
     keys = book_data[0].__dict__.keys()
-    with open(OUTPUT_FILE_NAME, 'w', newline='') as output_file:
+    with open(OUTPUT_FILE_NAME, 'w', newline='', encoding='utf-8') as output_file:
         dict_writer = csv.DictWriter(output_file, keys)
         dict_writer.writeheader()
         for book in range(len(book_data)):
