@@ -3,9 +3,32 @@ from Goodreads_list_scraper import list_scraper
 from Class_book_record import Book_Record
 import time
 import csv
+import sys
 
 
 OUTPUT_FILE_NAME = '20210218_book_data.csv'
+BASE_URL = "https://www.goodreads.com/"
+
+def list_url():
+    """ Creates the URL of a Goodreads list based on system arguments.
+    Defaults to most read this week if none entered """
+    # TODO: Add in choices and help statements as in command calculator exercise
+    # TODO: Add in errors for incorrectly entered arguments
+    if len(sys.argv) == 3:
+        # <type in [most-popular, most-read, new-releases, custom-list]>
+        # <details in [YYYYMM, COUNTRYPERIOD(eg ILM), genre, customID]>
+        type = sys.argv[1]
+        details = sys.argv[2]
+        if type == "most-popular":
+            return BASE_URL + "book/popular_by_date/" + str(details)[:4] + "/" + str(details)[4:]
+        if type == "most-read":
+            return BASE_URL + "book/most_read?category=all&country=" + str(details)[:2] + "&duration=" + str(details)[-1]
+        if type == "new-releases":
+            return BASE_URL + "genres/new_releases/" + str(details)
+        if type == "custom-list":
+            return BASE_URL + "list/show/" + str(details)
+    else:
+        return BASE_URL + "book/most_read"
 
 
 def scrape_books_from_list(book_ID_list):
@@ -39,7 +62,11 @@ def main():
     data as a CSV."""
     start_time = time.time()
 
-    book_ID_list = list_scraper('http://www.goodreads.com/book/popular_by_date/2020/11')
+    # book_ID_list = list_scraper('http://www.goodreads.com/book/popular_by_date/2020/11')
+
+    goodreads_url = list_url()
+    book_ID_list = list_scraper(goodreads_url)
+
     book_data = scrape_books_from_list(book_ID_list)
 
     time_taken = round(time.time() - start_time, 2)
