@@ -8,6 +8,8 @@ import sys
 
 OUTPUT_FILE_NAME = '20210218_book_data.csv'
 BASE_URL = "https://www.goodreads.com/"
+TYPE = 'most-read'
+DETAILS = "ILm"
 
 def list_url():
     """ Creates the URL of a Goodreads list based on system arguments.
@@ -16,17 +18,20 @@ def list_url():
     # TODO: Add in errors for incorrectly entered arguments
     if len(sys.argv) == 3:
         # <type in [most-popular, most-read, new-releases, custom-list]>
-        # <details in [YYYYMM, COUNTRYPERIOD(eg ILM), genre, customID]>
+        # <details in [YYYYMM, COUNTRYperiod(eg ILm), genre, customID]>
         type = sys.argv[1]
         details = sys.argv[2]
-        if type == "most-popular":
-            return BASE_URL + "book/popular_by_date/" + str(details)[:4] + "/" + str(details)[4:]
-        if type == "most-read":
-            return BASE_URL + "book/most_read?category=all&country=" + str(details)[:2] + "&duration=" + str(details)[-1]
-        if type == "new-releases":
-            return BASE_URL + "genres/new_releases/" + str(details)
-        if type == "custom-list":
-            return BASE_URL + "list/show/" + str(details)
+    else:
+        type = TYPE
+        details = DETAILS
+    if type == "most-popular":
+        return BASE_URL + "book/popular_by_date/" + str(details)[:4] + "/" + str(details)[4:]
+    if type == "most-read":
+        return BASE_URL + "book/most_read?category=all&country=" + str(details)[:2] + "&duration=" + str(details)[-1]
+    if type == "new-releases":
+        return BASE_URL + "genres/new_releases/" + str(details)
+    if type == "custom-list":
+        return BASE_URL + "list/show/" + str(details)
     else:
         return BASE_URL + "book/most_read"
 
