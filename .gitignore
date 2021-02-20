@@ -145,6 +145,7 @@ cython_debug/
 
 # Jordan's files:
 scribbling.py
+20210218_book_data.csv
 
 # Old readme.md
 readme-jordan.md
