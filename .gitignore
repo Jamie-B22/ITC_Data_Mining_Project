@@ -145,3 +145,7 @@ cython_debug/
 
 # Jordan's files:
 scribbling.py
+
+# Old readme.md
+readme-jordan.md
+readmeJB.md
