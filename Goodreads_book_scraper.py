@@ -16,7 +16,7 @@ Function for scraping Goodreads book pages for the data:
     Scrape_datetime : string format YYYY-MM-DD hh:mm:ss
     Description : str
 
-Author: Jamie Bamforth
+Authors: Jamie Bamforth and Jordan Ribbans
 """
 
 import requests
