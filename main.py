@@ -17,9 +17,9 @@ DETAILS = ""
 
 def list_url():
     """ Creates the URL of a Goodreads list based on system arguments.
-    Defaults to most read this week if none entered """
-    # TODO: Add in choices and help statements as in command calculator exercise
-    # TODO: Add in errors for incorrectly entered arguments
+    Defaults to most read this week in local country if none entered. """
+    # TODO: Before next checkpoint add in choices and help statements as in command calculator exercise
+    # TODO: Before next checkpoint add in errors for incorrectly entered arguments
     if len(sys.argv) == 3:
         # <type in [most-popular, most-read, new-releases, custom-list]>
         # <details in [YYYYMM, COUNTRYperiod(eg ILm), genre, customID]>

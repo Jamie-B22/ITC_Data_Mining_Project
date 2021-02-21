@@ -12,6 +12,8 @@ The web scraper was created as a project as part of the Data Science Pellows Pro
 
 `python3 main.py <type argument> <detail argument>`
 
+(Defaults to most read this week in local country if no arguments entered.)
+
 Where:
 
 
