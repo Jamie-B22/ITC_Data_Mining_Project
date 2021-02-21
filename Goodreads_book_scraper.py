@@ -101,7 +101,7 @@ def get_num_in_series(book_page_soup):
     if len(elems) == 0:
         return None
     else:
-        return elems[0].text.strip().strip('()').split('#')[1]
+        return elems[0].text.strip().strip('()').split('#')[-1]
 
 
 def get_author(book_page_soup):

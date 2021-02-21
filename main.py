@@ -6,7 +6,7 @@ import csv
 import sys
 
 
-OUTPUT_FILE_NAME = '20210218_book_data.csv'
+OUTPUT_FILE_NAME = 'test_book_data.csv'
 BASE_URL = "https://www.goodreads.com/"
 TYPE_ARG = 1
 DETAILS_ARG = 2
