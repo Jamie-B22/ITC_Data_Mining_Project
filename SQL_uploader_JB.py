@@ -20,13 +20,13 @@ book_author_mapping = Table(
 
 )
 
-# book_series_mapping = Table(
-#     "book_series_mapping",
-#     Base.metadata,
-#     Column("book_id", Integer, ForeignKey("book_records.id")),
-#     Column("series_id", Integer, ForeignKey("series.id"))
-#
-# )
+book_series_mapping = Table(
+    "book_series_mapping",
+    Base.metadata,
+    Column("book_id", Integer, ForeignKey("book_records.id")),
+    Column("series_id", Integer, ForeignKey("series.id"))
+
+)
 #
 # book_genre_mapping = Table(
 #     "book_genre_mapping",
@@ -54,6 +54,7 @@ class Book_record_declarative(Base):
     # relationship: this will not exist as a field in the 'book_records' table, it establishes a relationship object.
     # The first arg is the table it relates to (through the mapping table)
     # secondary=book_author_mapping is the mapping table
+    series = relationship('Series', secondary=book_series_mapping)
 
     def __init__(self, book_record_instance):
         self.goodreads_id = book_record_instance.Book_ID
@@ -84,6 +85,18 @@ class Author(Base):
     def __str__(self):
         return f'{self.id}, {self.name}'
 
+class Series(Base):
+    __tablename__ = 'series'
+    id = Column('id', Integer, primary_key=True)
+    name = Column('name', String(250), unique=True)
+    books = relationship('Book_record_declarative', secondary=book_series_mapping)
+
+    def __init__(self, name):
+        self.name = name
+
+    def __str__(self):
+        return f'{self.id}, {self.name}'
+
 
 def get_author(author_name):
     qry = session.query(Author).filter(Author.name == author_name).all()
@@ -92,6 +105,14 @@ def get_author(author_name):
     else:
         author = qry[0]
     return author
+
+def get_series(series_name):
+    qry = session.query(Series).filter(Series.name == series_name).all()
+    if len(qry) == 0:
+        series = Series(series_name)
+    else:
+        series = qry[0]
+    return series
 
 if __name__ == '__main__':
     with open('20210121_book_data_b.csv', 'r', newline='') as file:
@@ -110,6 +131,9 @@ if __name__ == '__main__':
         record = Book_record_declarative(book)
         author = get_author(book.Author)
         record.author = [author] # because this is one-to-many?
+        if len(book.Series) > 0: # don't create a series relationship if series doesn't exist #TODO: change to None scraping?
+            series = get_series(book.Series)
+            record.series = [series]
         session.add(record)
     session.commit()
     qry = session.query(Book_record_declarative).all()
