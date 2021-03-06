@@ -3,6 +3,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship, backref
 #TODO: add to install instructions: ensure using 64bit version of python for mysqlclient install
 import csv
+import json
 from Class_book_record import Book_Record
 
 #TODO: does session object need to be passed to functions it is used in?
@@ -27,13 +28,13 @@ book_series_mapping = Table(
     Column("series_id", Integer, ForeignKey("series.id"))
 
 )
-#
-# book_genre_mapping = Table(
-#     "book_genre_mapping",
-#     Base.metadata,
-#     Column("book_id", Integer, ForeignKey("book_records.id")),
-#     Column("genre_id", Integer, ForeignKey("genres.id"))
-# )
+
+book_genre_mapping = Table(
+    "book_genre_mapping",
+    Base.metadata,
+    Column("book_id", Integer, ForeignKey("book_records.id")),
+    Column("genre_id", Integer, ForeignKey("genres.id"))
+)
 
 class Book_record_declarative(Base):
     __tablename__ = 'book_records'
@@ -55,6 +56,8 @@ class Book_record_declarative(Base):
     # The first arg is the table it relates to (through the mapping table)
     # secondary=book_author_mapping is the mapping table
     series = relationship('Series', secondary=book_series_mapping)
+    genres = relationship('Genre', secondary=book_genre_mapping)
+    description = relationship('Description')
 
     def __init__(self, book_record_instance):
         self.goodreads_id = book_record_instance.Book_ID
@@ -98,6 +101,33 @@ class Series(Base):
         return f'{self.id}, {self.name}'
 
 
+class Genre(Base):
+    __tablename__ = 'genres'
+    id = Column('id', Integer, primary_key=True)
+    name = Column('name', String(250), unique=True)
+    books = relationship('Book_record_declarative', secondary=book_genre_mapping)
+
+    def __init__(self, name):
+        self.name = name
+
+    def __str__(self):
+        return f'{self.id}, {self.name}'
+
+
+class Description(Base):
+    __tablename__ = 'book_descriptions'
+    id = Column('id', Integer, primary_key=True)
+    book_id = Column("book_id", Integer, ForeignKey("book_records.id"))
+    description = Column('description', String(7500))
+    books = relationship('Book_record_declarative')
+
+    def __init__(self, description):
+        self.description = description
+
+    def __str__(self):
+        return f'{self.id}, {self.description}'
+
+
 def get_author(author_name):
     qry = session.query(Author).filter(Author.name == author_name).all()
     if len(qry) == 0:
@@ -114,6 +144,41 @@ def get_series(series_name):
         series = qry[0]
     return series
 
+def get_genre(genre_name):
+    qry = session.query(Genre).filter(Genre.name == genre_name).all()
+    if len(qry) == 0:
+        genre = Genre(genre_name)
+    else:
+        genre = qry[0]
+    return genre
+
+
+def get_genre_collection(genres):
+    return [get_genre(genre) for genre in genres]
+
+
+def ensure_set(obj): # TODO: could return False otherwise?
+    if isinstance(obj, str):
+        return {elem for elem in obj.strip("{'|'}").split("', '")}
+    else:
+        return obj
+
+def book_and_relationships_creator_and_adder(book_record_instance):
+    record = Book_record_declarative(book_record_instance)
+    author = get_author(book_record_instance.Author)
+    record.author = [author]  # because this is one-to-many?
+    if len(
+            book_record_instance.Series) > 0:  # don't create a series relationship if series doesn't exist #TODO: change to None scraping?
+        series = get_series(book_record_instance.Series)
+        record.series = [series]
+    book_record_instance.Genres = ensure_set(book_record_instance.Genres)
+    genres_collection = get_genre_collection(book_record_instance.Genres)
+    record.genres = genres_collection
+    description = Description(book_record_instance.Description)
+    record.description = [description]
+    session.add(record)
+    return record
+
 if __name__ == '__main__':
     with open('20210121_book_data_b.csv', 'r', newline='') as file:
         reader = csv.DictReader(file)
@@ -127,15 +192,10 @@ if __name__ == '__main__':
     session_maker = sessionmaker(bind=engine)
 
     session = session_maker()
-    for book in test_books[:4]:
-        record = Book_record_declarative(book)
-        author = get_author(book.Author)
-        record.author = [author] # because this is one-to-many?
-        if len(book.Series) > 0: # don't create a series relationship if series doesn't exist #TODO: change to None scraping?
-            series = get_series(book.Series)
-            record.series = [series]
-        session.add(record)
+    [book_and_relationships_creator_and_adder(book) for book in test_books[:4]]
+    scraped_list = {'URL': 'test_URL.com', 'Book_IDs':[148623, 175351, 7396319, 36030]}
     session.commit()
+    # log how many records added vs length of book list
     qry = session.query(Book_record_declarative).all()
     for row in qry:
         print(row)
