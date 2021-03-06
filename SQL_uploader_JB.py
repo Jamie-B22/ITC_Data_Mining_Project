@@ -41,7 +41,7 @@ book_list_mapping = Table(
     Base.metadata,
     Column("book_id", Integer, ForeignKey("book_records.id")),
     Column("list_id", Integer, ForeignKey("lists.id"))
-    # TODO:add in datetime or scrape batch
+    # TODO:add in datetime or scrape batch - not needed as each time a book is scraped, it creates a new ID?
 )
 
 class Book_record_declarative(Base):
@@ -122,7 +122,7 @@ class Genre(Base):
         return f'{self.id}, {self.name}'
 
 
-class Description(Base):
+class Description(Base): #TODO: create mapping table as records are appended
     __tablename__ = 'book_descriptions'
     id = Column('id', Integer, primary_key=True)
     book_id = Column("book_id", Integer, ForeignKey("book_records.id"))
@@ -180,6 +180,7 @@ def get_genre_collection(genres, session):
     return [get_genre(genre, session) for genre in genres]
 
 def get_description(description_text, session):
+    description_text = description_text.encode('UTF-16', errors='replace') # ensure any non-UTF-8 characters are removed to ensure compatiability
     qry = session.query(Description).filter(Description.description == description_text).all()
     if len(qry) == 0:
         description = Description(description_text)
@@ -213,7 +214,7 @@ def book_and_relationships_creator_and_adder(book_record_instance, session):
     book_record_instance.Genres = ensure_set(book_record_instance.Genres)
     genres_collection = get_genre_collection(book_record_instance.Genres, session)
     record.genres = genres_collection
-    description = get_description(book_record_instance.Description, session) # TODO: put somewhere hat desciption only exists as a separate tabl is to save mamory, each description is associated with multiple book title pulls.
+    description = get_description(book_record_instance.Description, session) # TODO: put somewhere that desciption only exists as a separate tabl is to save mamory, each description is associated with multiple book title pulls.
     record.description = [description]
     session.add(record)
     return record
@@ -221,7 +222,7 @@ def book_and_relationships_creator_and_adder(book_record_instance, session):
 
 def list_and_relationships_creator_and_adder(scraped_list_url, type_arg, details_arg, book_records, session):
     book_list = get_book_list(scraped_list_url, type_arg, details_arg, session)
-    book_list.books = book_records
+    book_list.books += book_records # updates appends to mapping table for that list rather than overwriting
     session.add(book_list)
     return book_list
 
@@ -251,7 +252,7 @@ if __name__ == '__main__':
     scraped_list_url = 'https://www.goodreads.com/book/most_read'
     type_arg = 'test_type'
     details_arg = 'test_details'
-    update_db(test_books[:4], scraped_list_url, type_arg, details_arg)
+    update_db(test_books, scraped_list_url, type_arg, details_arg)
 
 
 
