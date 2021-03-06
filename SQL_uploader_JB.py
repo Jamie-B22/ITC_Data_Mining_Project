@@ -36,6 +36,13 @@ book_genre_mapping = Table(
     Column("genre_id", Integer, ForeignKey("genres.id"))
 )
 
+book_list_mapping = Table(
+    "book_list_mapping",
+    Base.metadata,
+    Column("book_id", Integer, ForeignKey("book_records.id")),
+    Column("list_id", Integer, ForeignKey("lists.id"))
+)
+
 class Book_record_declarative(Base):
     __tablename__ = 'book_records'
     id = Column('id', Integer, primary_key=True)
@@ -112,6 +119,19 @@ class Genre(Base):
 
     def __str__(self):
         return f'{self.id}, {self.name}'
+
+class List(Base):
+    __tablename__ = 'lists'
+    id = Column('id', Integer, primary_key=True)
+    name = Column('name', String(250), unique=True)
+    url = Column('url', String(500), unique=True)
+    books = relationship('Book_record_declarative', secondary=book_list_mapping)
+
+    def __init__(self, name):
+        self.name = name
+
+    def __str__(self):
+        return f'{self.id}, {self.name}, {self.url}'
 
 
 class Description(Base):
