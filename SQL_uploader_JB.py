@@ -164,7 +164,7 @@ class Edition(Base):
 
     def __init__(self, book_record_instance):
         self.goodreads_id = book_record_instance.Book_ID
-        self.title = book_record_instance.Title.encode('UTF-16', errors='replace')
+        self.title = book_record_instance.Title.encode('UTF-8', errors='replace')
         self.format = book_record_instance.Format
         self.number_in_series = book_record_instance.Number_in_series
         self.release_date = book_record_instance.Release_date
@@ -206,7 +206,7 @@ def get_genre_collection(genres, session):
     return [get_genre(genre, session) for genre in genres]
 
 def get_description(description_text, session):
-    description_text = description_text.encode('UTF-16', errors='replace') # ensure any non-UTF-8 characters are removed to ensure compatiability
+    description_text = description_text.encode('UTF-8', errors='replace') # ensure any non-UTF-8 characters are removed to ensure compatiability
     qry = session.query(Description).filter(Description.description == description_text).all()
     if len(qry) == 0:
         description = Description(description_text)
