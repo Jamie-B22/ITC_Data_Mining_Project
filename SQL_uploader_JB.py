@@ -49,29 +49,24 @@ book_description_mapping = Table(
     Column("book_id", Integer, ForeignKey("book_records.id")),
     Column("description_id", Integer, ForeignKey("descriptions.id"))
 )
-#
-# book_edition_mapping = Table(
-#     "book_edition_mapping",
-#     Base.metadata,
-#     Column("book_id", Integer, ForeignKey("book_records.id")),
-#     Column("edition_id", Integer, ForeignKey("editions.id"))
-# )
+
+book_edition_mapping = Table(
+    "book_edition_mapping",
+    Base.metadata,
+    Column("book_id", Integer, ForeignKey("book_records.id")),
+    Column("edition_id", Integer, ForeignKey("editions.id"))
+)
 
 class Book_record_declarative(Base):
     __tablename__ = 'book_records'
     id = Column('id', Integer, primary_key=True)
-    goodreads_id = Column('goodreads_id', Integer)
-    title = Column('title', String(250))
-    format = Column('format', String(250))
-    number_in_series = Column('number_in_series', String(250))
     rating = Column('rating', DECIMAL(3,2))
-    release_date = Column('release_date', String(10))
-    first_published_date = Column('first_published_date', String(10))
     qty_ratings = Column('qty_ratings', Integer)
     qty_reviews = Column('qty_reviews', Integer)
     qty_pages = Column('qty_rpages', Integer)
     scrape_datetime = Column('scrape_datetime', String(25))
 
+    edition = relationship('Edition', secondary=book_edition_mapping)
     author = relationship('Author', secondary=book_author_mapping)
     # relationship: this will not exist as a field in the 'book_records' table, it establishes a relationship object.
     # The first arg is the table it relates to (through the mapping table)
@@ -81,13 +76,7 @@ class Book_record_declarative(Base):
     description = relationship('Description', secondary=book_description_mapping)
 
     def __init__(self, book_record_instance):
-        self.goodreads_id = book_record_instance.Book_ID
-        self.title = book_record_instance.Title
-        self.format = book_record_instance.Format
-        self.number_in_series = book_record_instance.Number_in_series
         self.rating = book_record_instance.Rating
-        self.release_date = book_record_instance.Release_date
-        self.first_published_date = book_record_instance.First_published_date
         self.qty_ratings = book_record_instance.Qty_ratings
         self.qty_reviews = book_record_instance.Qty_reviews
         self.qty_pages = book_record_instance.Qty_pages
@@ -162,11 +151,27 @@ class List(Base):
     def __str__(self):
         return f'{self.id}, {self.name}, {self.url}'
 
-# class Edition(Base):
-#     __tablename__ = 'editions'
-#     id = Column('id', Integer, primary_key=True)
-#
-#     books = relationship('Book_record_declarative', secondary=book_edition_mapping)
+class Edition(Base):
+    __tablename__ = 'editions'
+    id = Column('id', Integer, primary_key=True)
+    goodreads_id = Column('goodreads_id', Integer)
+    title = Column('title', String(250))
+    format = Column('format', String(250))
+    number_in_series = Column('number_in_series', String(250))
+    release_date = Column('release_date', String(10))
+    first_published_date = Column('first_published_date', String(10))
+    books = relationship('Book_record_declarative', secondary=book_edition_mapping)
+
+    def __init__(self, book_record_instance):
+        self.goodreads_id = book_record_instance.Book_ID
+        self.title = book_record_instance.Title
+        self.format = book_record_instance.Format
+        self.number_in_series = book_record_instance.Number_in_series
+        self.release_date = book_record_instance.Release_date
+        self.first_published_date = book_record_instance.First_published_date
+
+    def __str__(self):
+        return str(self.__dict__.values())
 
 
 ############## Functions below this line, SQLAlchemy classes and tables above ################
@@ -209,6 +214,16 @@ def get_description(description_text, session):
         description = qry[0]
     return description
 
+def get_edition(book_record_instance, session):
+    qry = session.query(Edition).filter(Edition.goodreads_id == book_record_instance.Book_ID and
+                                        Edition.title == book_record_instance.Title and
+                                        Edition.format == book_record_instance.Format).all()
+    if len(qry) == 0:
+        edition = Edition(book_record_instance)
+    else:
+        edition = qry[0]
+    return edition
+
 def get_book_list(scraped_list_url, type_arg, details_arg, session):
     qry = session.query(List).filter(List.url == scraped_list_url).all()
     if len(qry) == 0:
@@ -226,6 +241,8 @@ def ensure_set(obj): # TODO: could return False otherwise?
 
 def book_and_relationships_creator_and_adder(book_record_instance, session):
     record = Book_record_declarative(book_record_instance)
+    edition = get_edition(book_record_instance, session)
+    record.edition = [edition]
     author = get_author(book_record_instance.Author, session)
     record.author = [author]  # because this is one-to-many?
     if len(
