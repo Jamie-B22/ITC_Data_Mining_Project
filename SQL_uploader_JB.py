@@ -41,8 +41,21 @@ book_list_mapping = Table(
     Base.metadata,
     Column("book_id", Integer, ForeignKey("book_records.id")),
     Column("list_id", Integer, ForeignKey("lists.id"))
-    # TODO:add in datetime or scrape batch - not needed as each time a book is scraped, it creates a new ID?
 )
+
+book_description_mapping = Table(
+    "book_description_mapping",
+    Base.metadata,
+    Column("book_id", Integer, ForeignKey("book_records.id")),
+    Column("description_id", Integer, ForeignKey("descriptions.id"))
+)
+#
+# book_edition_mapping = Table(
+#     "book_edition_mapping",
+#     Base.metadata,
+#     Column("book_id", Integer, ForeignKey("book_records.id")),
+#     Column("edition_id", Integer, ForeignKey("editions.id"))
+# )
 
 class Book_record_declarative(Base):
     __tablename__ = 'book_records'
@@ -65,7 +78,7 @@ class Book_record_declarative(Base):
     # secondary=book_author_mapping is the mapping table
     series = relationship('Series', secondary=book_series_mapping)
     genres = relationship('Genre', secondary=book_genre_mapping)
-    description = relationship('Description')
+    description = relationship('Description', secondary=book_description_mapping)
 
     def __init__(self, book_record_instance):
         self.goodreads_id = book_record_instance.Book_ID
@@ -122,12 +135,11 @@ class Genre(Base):
         return f'{self.id}, {self.name}'
 
 
-class Description(Base): #TODO: create mapping table as records are appended
-    __tablename__ = 'book_descriptions'
+class Description(Base):
+    __tablename__ = 'descriptions'
     id = Column('id', Integer, primary_key=True)
-    book_id = Column("book_id", Integer, ForeignKey("book_records.id"))
-    description = Column('description', String(7500))
-    books = relationship('Book_record_declarative')
+    description = Column('description', String(10000)) #TODO: deal with error where string is too long (truncate str[:10000])
+    books = relationship('Book_record_declarative', secondary=book_description_mapping)
 
     def __init__(self, description):
         self.description = description
@@ -149,6 +161,15 @@ class List(Base):
 
     def __str__(self):
         return f'{self.id}, {self.name}, {self.url}'
+
+# class Edition(Base):
+#     __tablename__ = 'editions'
+#     id = Column('id', Integer, primary_key=True)
+#
+#     books = relationship('Book_record_declarative', secondary=book_edition_mapping)
+
+
+############## Functions below this line, SQLAlchemy classes and tables above ################
 
 
 def get_author(author_name, session):
