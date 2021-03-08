@@ -72,13 +72,13 @@ def get_title(book_page_soup):
     """Takes the HTML Beautiful Soup object of a Goodreads book page and returns the title of the book as a string."""
     selector = '#bookTitle'
     elems = book_page_soup.select(selector)
-    return elems[0].text.strip()
+    return elems[0].text.strip().encode('ascii', errors='ignore').decode('utf-8')
 
 
 def get_format(book_page_soup):
     """Takes the HTML Beautiful Soup object of a Goodreads book page and returns the format of the book as a string."""
     elem = book_page_soup.find('span', {'itemprop': 'bookFormat'})
-    return elem.text
+    return elem.text.encode('ascii', errors='ignore').decode('utf-8')
 
 
 def get_series(book_page_soup):
@@ -89,7 +89,7 @@ def get_series(book_page_soup):
     if len(elems) == 0:
         return None
     else:
-        return elems[0].text.strip().strip('()').split('#')[0].strip()
+        return elems[0].text.strip().strip('()').split('#')[0].strip().encode('ascii', errors='ignore').decode('utf-8')
 
 
 def get_num_in_series(book_page_soup):
@@ -101,14 +101,14 @@ def get_num_in_series(book_page_soup):
     if len(elems) == 0:
         return None
     else:
-        return elems[0].text.strip().strip('()').split('#')[-1]
+        return elems[0].text.strip().strip('()').split('#')[-1].encode('ascii', errors='ignore').decode('utf-8')
 
 
 def get_author(book_page_soup):
     """Takes the HTML Beautiful Soup object of a Goodreads book page and returns Author as a string."""
     selector = '#bookAuthors > span:nth-child(2) > div > a > span'
     elems = book_page_soup.select(selector)
-    return elems[0].text
+    return elems[0].text.encode('ascii', errors='ignore').decode('utf-8')
 
 
 def get_rating(book_page_soup):
@@ -154,7 +154,7 @@ def get_description(book_page_soup):
     a string."""
     selector = '#description'
     elems = book_page_soup.select(selector)
-    return elems[0].text.strip().rstrip('..more').strip()
+    return elems[0].text.strip().rstrip('..more').strip().encode('ascii', errors='ignore').decode('utf-8')
 
 
 def get_num_pages(book_page_soup):
@@ -218,7 +218,7 @@ def parse_page_html(Book_ID, book_page_soup):
 
     book_data['Scrape_datetime'] = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
 
-    book_data['Description'] = get_description(book_page_soup)
+    book_data['Description'] = get_description(book_page_soup).encode('ascii', errors='ignore').decode('utf-8')
     return book_data
 
 

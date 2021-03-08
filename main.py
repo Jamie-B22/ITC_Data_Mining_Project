@@ -75,7 +75,7 @@ def main():
     # book_ID_list = list_scraper('http://www.goodreads.com/book/popular_by_date/2020/11')
 
     goodreads_url = list_url()
-    book_ID_list = list_scraper(goodreads_url)[:4] #TODO: remove limit
+    book_ID_list = list_scraper(goodreads_url)[:2] #TODO: remove limit
 
     book_data = scrape_books_from_list(book_ID_list)
 
