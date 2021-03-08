@@ -1,6 +1,7 @@
 from Goodreads_book_scraper import book_scraper
 from Goodreads_list_scraper import list_scraper
 from Class_book_record import Book_Record
+from SQL_uploader_JB import update_db
 import time
 import csv
 import sys
@@ -74,14 +75,15 @@ def main():
     # book_ID_list = list_scraper('http://www.goodreads.com/book/popular_by_date/2020/11')
 
     goodreads_url = list_url()
-    book_ID_list = list_scraper(goodreads_url)
+    book_ID_list = list_scraper(goodreads_url)[:4] #TODO: remove limit
 
     book_data = scrape_books_from_list(book_ID_list)
 
     time_taken = round(time.time() - start_time, 2)
     if len(book_data) != 0:
         print(f'Took {time_taken}s to scrape {len(book_data)} books, {round(time_taken/len(book_data),2)}s per book.')
-        write_to_csv(book_data)
+        # write_to_csv(book_data)
+        update_db(book_data, goodreads_url, 'test_list', 'test_details') #TODO: get type and details args
 
 
 if __name__ == '__main__':

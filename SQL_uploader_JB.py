@@ -164,7 +164,7 @@ class Edition(Base):
 
     def __init__(self, book_record_instance):
         self.goodreads_id = book_record_instance.Book_ID
-        self.title = book_record_instance.Title
+        self.title = book_record_instance.Title.encode('UTF-16', errors='replace')
         self.format = book_record_instance.Format
         self.number_in_series = book_record_instance.Number_in_series
         self.release_date = book_record_instance.Release_date
@@ -245,8 +245,7 @@ def book_and_relationships_creator_and_adder(book_record_instance, session):
     record.edition = [edition]
     author = get_author(book_record_instance.Author, session)
     record.author = [author]  # because this is one-to-many?
-    if len(
-            book_record_instance.Series) > 0:  # don't create a series relationship if series doesn't exist #TODO: change to None scraping?
+    if book_record_instance.Series is not None:  # don't create a series relationship if series doesn't exist #TODO: change to None scraping?
         series = get_series(book_record_instance.Series, session)
         record.series = [series]
     book_record_instance.Genres = ensure_set(book_record_instance.Genres)
