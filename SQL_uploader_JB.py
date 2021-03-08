@@ -134,16 +134,18 @@ class Description(Base):
 class List(Base):
     __tablename__ = 'lists'
     id = Column('id', Integer, primary_key=True)
-    name = Column('name', String(250)) # not unique as may be multiple (past) url formats that we want to store still
+    type = Column('type', String(250))
+    details = Column('details', String(250))
     url = Column('url', String(500), unique=True)
     books = relationship('Book_record_declarative', secondary=book_list_mapping)
 
     def __init__(self, list_url, type_arg, details_arg):
-        self.name = ' '.join([type_arg, details_arg])
+        self.type = type_arg
+        self.details = details_arg
         self.url = list_url
 
     def __str__(self):
-        return f'{self.id}, {self.name}, {self.url}'
+        return f'{self.id}, {self.type}, {self.details}, {self.url}'
 
 class Edition(Base):
     __tablename__ = 'editions'
