@@ -13,26 +13,26 @@ password = 'Logout22' #TODO: make this user input?
 SQL_LANGUAGE_CONNECTION = f'mysql://root:{password}@localhost/mydb'
 Base = declarative_base() #TODO: can this be in the main fn?
 
-book_author_mapping = Table(
-    "book_author_mapping",
+edition_author_mapping = Table(
+    "edition_author_mapping",
     Base.metadata,
-    Column("book_id", Integer, ForeignKey("book_records.id")),
+    Column("edition_id", Integer, ForeignKey("editions.id")),
     Column("author_id", Integer, ForeignKey("authors.id"))
 
 )
 
-book_series_mapping = Table(
-    "book_series_mapping",
+edition_series_mapping = Table(
+    "edition_series_mapping",
     Base.metadata,
-    Column("book_id", Integer, ForeignKey("book_records.id")),
+    Column("edition_id", Integer, ForeignKey("editions.id")),
     Column("series_id", Integer, ForeignKey("series.id"))
 
 )
 
-book_genre_mapping = Table(
-    "book_genre_mapping",
+edition_genre_mapping = Table(
+    "edition_genre_mapping",
     Base.metadata,
-    Column("book_id", Integer, ForeignKey("book_records.id")),
+    Column("edition_id", Integer, ForeignKey("editions.id")),
     Column("genre_id", Integer, ForeignKey("genres.id"))
 )
 
@@ -67,12 +67,6 @@ class Book_record_declarative(Base):
     scrape_datetime = Column('scrape_datetime', String(25))
 
     edition = relationship('Edition', secondary=book_edition_mapping)
-    author = relationship('Author', secondary=book_author_mapping)
-    # relationship: this will not exist as a field in the 'book_records' table, it establishes a relationship object.
-    # The first arg is the table it relates to (through the mapping table)
-    # secondary=book_author_mapping is the mapping table
-    series = relationship('Series', secondary=book_series_mapping)
-    genres = relationship('Genre', secondary=book_genre_mapping)
     description = relationship('Description', secondary=book_description_mapping)
 
     def __init__(self, book_record_instance):
@@ -90,7 +84,7 @@ class Author(Base):
     __tablename__ = 'authors'
     id = Column('id', Integer, primary_key=True)
     name = Column('name', String(250), unique=True)
-    books = relationship('Book_record_declarative', secondary=book_author_mapping)
+    editions = relationship('Edition', secondary=edition_author_mapping)
 
     def __init__(self, name):
         self.name = name
@@ -102,7 +96,7 @@ class Series(Base):
     __tablename__ = 'series'
     id = Column('id', Integer, primary_key=True)
     name = Column('name', String(250), unique=True)
-    books = relationship('Book_record_declarative', secondary=book_series_mapping)
+    editions = relationship('Edition', secondary=edition_series_mapping)
 
     def __init__(self, name):
         self.name = name
@@ -115,7 +109,7 @@ class Genre(Base):
     __tablename__ = 'genres'
     id = Column('id', Integer, primary_key=True)
     name = Column('name', String(250), unique=True)
-    books = relationship('Book_record_declarative', secondary=book_genre_mapping)
+    editions = relationship('Edition', secondary=edition_genre_mapping)
 
     def __init__(self, name):
         self.name = name
@@ -161,6 +155,12 @@ class Edition(Base):
     release_date = Column('release_date', String(10))
     first_published_date = Column('first_published_date', String(10))
     books = relationship('Book_record_declarative', secondary=book_edition_mapping)
+    author = relationship('Author', secondary=edition_author_mapping)
+    # relationship: this will not exist as a field in the 'editions' table, it establishes a relationship object.
+    # The first arg is the table it relates to (through the mapping table)
+    # secondary=book_author_mapping is the mapping table
+    series = relationship('Series', secondary=edition_series_mapping)
+    genres = relationship('Genre', secondary=edition_genre_mapping)
 
     def __init__(self, book_record_instance):
         self.goodreads_id = book_record_instance.Book_ID
@@ -244,13 +244,13 @@ def book_and_relationships_creator_and_adder(book_record_instance, session):
     edition = get_edition(book_record_instance, session)
     record.edition = [edition]
     author = get_author(book_record_instance.Author, session)
-    record.author = [author]  # because this is one-to-many?
+    edition.author = [author]  # because this is one-to-many?
     if book_record_instance.Series is not None:  # don't create a series relationship if series doesn't exist #TODO: change to None scraping?
         series = get_series(book_record_instance.Series, session)
-        record.series = [series]
+        edition.series = [series]
     book_record_instance.Genres = ensure_set(book_record_instance.Genres)
     genres_collection = get_genre_collection(book_record_instance.Genres, session)
-    record.genres = genres_collection
+    edition.genres = genres_collection
     description = get_description(book_record_instance.Description, session) # TODO: put somewhere that desciption only exists as a separate tabl is to save mamory, each description is associated with multiple book title pulls.
     record.description = [description]
     session.add(record)
