@@ -10,6 +10,8 @@ import argparse
 import logging
 import sys
 
+# TODO: Remove duplicate log lines
+
 logger = logging.getLogger('main')
 logger.setLevel(logging.DEBUG)
 
@@ -107,7 +109,7 @@ def main():
     start_time = time.time()
     logger.info(f"Program started at {dt.datetime.now()}")
 
-    command_dict = args_dict()
+    command_dict = dict(args_dict())
     list_type = command_dict["list_type"]
     list_detail = command_dict["list_detail"]
     goodreads_url = list_url(list_type, list_detail)
@@ -120,8 +122,12 @@ def main():
     if len(book_data) != 0:
         logger.info(f'Took {time_taken}s to scrape {len(book_data)} books,'
                     f' {round(time_taken/len(book_data),2)}s per book.')
-        # write_to_csv(book_data) # TODO: do try except here and if there is an error, upload to csv as backup and log it was added to csv?
-        update_db(book_data, goodreads_url, list_type, list_detail)
+        try:
+            update_db(book_data, goodreads_url, list_type, list_detail)
+        except:
+            logger.info("Writing data to CSV file")
+            write_to_csv(book_data)
+            logger.info(f"Data saved to file: {OUTPUT_FILE_NAME}")
 
 
 if __name__ == '__main__':
