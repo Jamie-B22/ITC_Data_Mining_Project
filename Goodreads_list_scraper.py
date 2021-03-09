@@ -6,6 +6,25 @@ Authors: Jamie Bamforth and Jordan Ribbans
 
 import requests
 import bs4
+import logging
+import sys
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
+# Create Formatter
+formatter = logging.Formatter('%(asctime)s-%(levelname)s-FILE:%(filename)s-FUNC:%(funcName)s-LINE:%(lineno)d-%(message)s')
+
+# create a file handler and add it to logger
+file_handler = logging.FileHandler('main.log')
+file_handler.setLevel(logging.DEBUG)
+file_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
+
+stream_handler = logging.StreamHandler(sys.stdout)
+stream_handler.setLevel(logging.WARNING)
+stream_handler.setFormatter(formatter)
+logger.addHandler(stream_handler)
 
 
 def request_get(list_url, proxy_address=None):
@@ -60,7 +79,7 @@ def list_scraper(list_url, proxy_address=None):
     Takes a URL for the most read, most popular or new releases lists on Goodreads and returns a list of the book IDs in the list
     Optional parameter for a proxy address if there have been too many requests and the scraping is throttled
     """
-    print(f"Scraping list {list_url}")
+    logger.debug(f"Scraping list {list_url}")
 
     id_list = list_parser(list_url)
 
