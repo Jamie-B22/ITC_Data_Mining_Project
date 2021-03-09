@@ -15,8 +15,9 @@ from Class_book_record import Book_Record
 #TODO: does session object need to be passed to functions it is used in?
 #TODO: change dates to date type
 #TODO: documentation and justification on why columns are in tables at the top. Explain that 'get' fns are to prevent duplicates in those tables
+user = 'root'
 password = 'Logout22' #TODO: make this user input?
-SQL_LANGUAGE_CONNECTION = f'mysql://root:{password}@localhost/mydb'
+SQL_LANGUAGE_CONNECTION = f'mysql://{user}:{password}@localhost/goodreads_data'
 Base = declarative_base() #TODO: can this be in the main fn?
 
 edition_author_mapping = Table(
@@ -69,7 +70,6 @@ class Book_record_declarative(Base):
     rating = Column('rating', DECIMAL(3,2))
     qty_ratings = Column('qty_ratings', Integer)
     qty_reviews = Column('qty_reviews', Integer)
-    qty_pages = Column('qty_rpages', Integer)
     scrape_datetime = Column('scrape_datetime', String(25))
 
     edition = relationship('Edition', secondary=book_edition_mapping)
@@ -79,7 +79,6 @@ class Book_record_declarative(Base):
         self.rating = book_record_instance.Rating
         self.qty_ratings = book_record_instance.Qty_ratings
         self.qty_reviews = book_record_instance.Qty_reviews
-        self.qty_pages = book_record_instance.Qty_pages
         self.scrape_datetime = book_record_instance.Scrape_datetime
 
     def __str__(self):
@@ -162,6 +161,8 @@ class Edition(Base):
     number_in_series = Column('number_in_series', String(250))
     release_date = Column('release_date', String(10))
     first_published_date = Column('first_published_date', String(10))
+    qty_pages = Column('qty_rpages', Integer)
+
     books = relationship('Book_record_declarative', secondary=book_edition_mapping)
     author = relationship('Author', secondary=edition_author_mapping)
     # relationship: this will not exist as a field in the 'editions' table, it establishes a relationship object.
@@ -177,6 +178,7 @@ class Edition(Base):
         self.number_in_series = book_record_instance.Number_in_series
         self.release_date = book_record_instance.Release_date
         self.first_published_date = book_record_instance.First_published_date
+        self.qty_pages = book_record_instance.Qty_pages
 
     def __str__(self):
         return str(self.__dict__.values())
