@@ -68,8 +68,9 @@ def list_scraper(list_url, proxy_address=None):
 
     return id_list
 
-
-def main():
+def list_scraper_tests():
+    """Some tests to visually check the output is as expected. No asserts as there are external dependancies that may
+    change (website may update)"""
     # print(list_scraper('http://www.goodreads.com/book/popular_by_date/2020/11', '139.99.102.114:80'))
     # print(list_scraper('https://www.goodreads.com/genres/new_releases/fiction', '139.99.102.114:80'))
     # print(list_scraper('http://www.goodreads.com/book/popular_by_date/2020/11'))
@@ -80,4 +81,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    list_scraper_tests()

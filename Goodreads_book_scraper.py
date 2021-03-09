@@ -235,7 +235,7 @@ def book_scraper(Book_ID, proxy_address=None):
     return book_data
 
 
-def tests():
+def book_scraper_tests():
     """Tests scraper against data that should not change, eg. title, author, number of pages.
     Some data such as qty reviews will change live and so is not tested."""
     # test book ID 186074
@@ -262,7 +262,7 @@ def tests():
     assert book_data['First_published_date'] == '2005-07-16'
     assert book_data['Qty_pages'] == 652
 
-    # test 48764258
+    # test book ID 48764258
     book_data = book_scraper('48764258')
     assert book_data['Book_ID'] == '48764258'
     assert book_data['Title'] == 'Tsarina'
@@ -277,10 +277,6 @@ def tests():
     print('book_scraper() tests successful')
 
 
-def main():
-    """Runs tests()"""
-    tests()
-
 
 if __name__ == '__main__':
-    main()
+    book_scraper_tests()
