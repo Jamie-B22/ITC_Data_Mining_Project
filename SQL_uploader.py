@@ -1,5 +1,5 @@
 """
-Functions and SQLAlchemy classes and for defining database and enabling upload to the database.
+Functions and SQLAlchemy classes for defining database and enabling upload to the database.
 
 Author: Jamie Bamforth
 """
@@ -9,16 +9,41 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 import csv
 import stdiomask
+import logging
+import sys
 from Class_book_record import BookRecord
 
 # TODO: change dates to date type
 # TODO: documentation and justification on why columns are in tables at the top. Explain that 'get' fns are to prevent
 #  duplicates in those tables
+
+"""Setup connection to database."""
 USER = input('MySQL Username:')
 # masks password when run from terminal (will not mask when run in python console)
 PASSWORD = stdiomask.getpass('MySQL Password:', mask='*')  
 SQL_LANGUAGE_CONNECTION = f'mysql://{USER}:{PASSWORD}@localhost/goodreads_data'
 Base = declarative_base()
+
+
+"""Setup Logger"""
+logger = logging.getLogger('main')
+logger.setLevel(logging.DEBUG)
+
+# Create Formatter
+formatter = logging.Formatter(
+    '%(asctime)s-%(levelname)s-FILE:%(filename)s-FUNC:%(funcName)s-LINE:%(lineno)d-%(message)s')
+
+# create a file handler and add it to logger
+file_handler = logging.FileHandler('main.log')
+file_handler.setLevel(logging.DEBUG)
+file_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
+
+stream_handler = logging.StreamHandler(sys.stdout)
+stream_handler.setLevel(logging.WARNING)
+stream_handler.setFormatter(formatter)
+logger.addHandler(stream_handler)
+
 
 edition_author_mapping = Table(
     "edition_author_mapping",
@@ -129,7 +154,7 @@ class Genre(Base):
 class Description(Base):
     __tablename__ = 'descriptions'
     id = Column('id', Integer, primary_key=True)
-    description = Column('description',String(10000))  # TODO: deal with error where string is too long (truncate str[:10000])
+    description = Column('description', String(10000))  # TODO: deal with error where string is too long (truncate str[:10000])
     book_updates = relationship('BookUpdate', secondary=update_description_mapping)
 
     def __init__(self, description):
@@ -299,14 +324,22 @@ def create_and_commit_data(books, list_url, list_type, list_details, session):
     book_updates = [book_and_relationships_creator_and_adder(book, session) for book in books]
     list_and_relationships_creator_and_adder(list_url, list_type, list_details, book_updates, session)
     session.commit()
-    # TODO: log how many records added vs length of book list
+    logger.info(f'{len(book_updates)} committed to database.')
 
 
 def update_db(books, list_url, list_type, list_details):
-    # TODO: log uploading to db
-    session = initialise_session()
-    create_and_commit_data(books, list_url, list_type, list_details, session)
-    session.close()
+    logger.info(f'Uploading {len(books)} to database.')
+    # Next comment is to remove PyCharm warning, this broad exception is intentional.
+    # noinspection PyBroadException
+    try:
+        session = initialise_session()
+        logger.debug(f'Database connection session initialised.')
+        create_and_commit_data(books, list_url, list_type, list_details, session)
+        session.close()
+        logger.debug(f'Database connection session closed.')
+    except Exception:
+        raise ConnectionError('Failed to connect to database.')
+        logger.error(f'Unable to initialise connection to database, data not saved in database.')
 
 
 if __name__ == '__main__':

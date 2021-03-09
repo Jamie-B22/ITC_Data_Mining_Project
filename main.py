@@ -120,7 +120,7 @@ def main():
     if len(book_data) != 0:
         logger.info(f'Took {time_taken}s to scrape {len(book_data)} books,'
                     f' {round(time_taken/len(book_data),2)}s per book.')
-        # write_to_csv(book_data)
+        # write_to_csv(book_data) # TODO: do try except here and if there is an error, upload to csv as backup and log it was added to csv?
         update_db(book_data, goodreads_url, list_type, list_detail)
 
 
