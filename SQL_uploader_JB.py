@@ -43,37 +43,38 @@ edition_genre_mapping = Table(
     Column("genre_id", Integer, ForeignKey("genres.id"))
 )
 
-book_list_mapping = Table(
-    "book_list_mapping",
+update_list_mapping = Table(
+    "update_list_mapping",
     Base.metadata,
-    Column("book_id", Integer, ForeignKey("book_records.id")),
+    Column("book_id", Integer, ForeignKey("book_updates.id")),
     Column("list_id", Integer, ForeignKey("lists.id"))
 )
 
-book_description_mapping = Table(
-    "book_description_mapping",
+update_description_mapping = Table(
+    "update_description_mapping",
     Base.metadata,
-    Column("book_id", Integer, ForeignKey("book_records.id")),
+    Column("book_id", Integer, ForeignKey("book_updates.id")),
     Column("description_id", Integer, ForeignKey("descriptions.id"))
 )
 
-book_edition_mapping = Table(
-    "book_edition_mapping",
+update_edition_mapping = Table(
+    "update_edition_mapping",
     Base.metadata,
-    Column("book_id", Integer, ForeignKey("book_records.id")),
+    Column("book_id", Integer, ForeignKey("book_updates.id")),
     Column("edition_id", Integer, ForeignKey("editions.id"))
 )
 
-class Book_record_declarative(Base):
-    __tablename__ = 'book_records'
+class Book_update(Base):
+    __tablename__ = 'book_updates'
     id = Column('id', Integer, primary_key=True)
     rating = Column('rating', DECIMAL(3,2))
     qty_ratings = Column('qty_ratings', Integer)
     qty_reviews = Column('qty_reviews', Integer)
     scrape_datetime = Column('scrape_datetime', String(25))
 
-    edition = relationship('Edition', secondary=book_edition_mapping)
-    description = relationship('Description', secondary=book_description_mapping)
+    edition = relationship('Edition', secondary=update_edition_mapping)
+    description = relationship('Description', secondary=update_description_mapping)
+    list = relationship('List', secondary=update_list_mapping)
 
     def __init__(self, book_record_instance):
         self.rating = book_record_instance.Rating
@@ -127,7 +128,7 @@ class Description(Base):
     __tablename__ = 'descriptions'
     id = Column('id', Integer, primary_key=True)
     description = Column('description', String(10000)) #TODO: deal with error where string is too long (truncate str[:10000])
-    books = relationship('Book_record_declarative', secondary=book_description_mapping)
+    book_updates = relationship('Book_update', secondary=update_description_mapping)
 
     def __init__(self, description):
         self.description = description
@@ -142,7 +143,7 @@ class List(Base):
     type = Column('type', String(250))
     details = Column('details', String(250))
     url = Column('url', String(500), unique=True)
-    books = relationship('Book_record_declarative', secondary=book_list_mapping)
+    book_updates = relationship('Book_update', secondary=update_list_mapping)
 
     def __init__(self, list_url, type_arg, details_arg):
         self.type = type_arg
@@ -163,7 +164,7 @@ class Edition(Base):
     first_published_date = Column('first_published_date', String(10))
     qty_pages = Column('qty_rpages', Integer)
 
-    books = relationship('Book_record_declarative', secondary=book_edition_mapping)
+    book_updates = relationship('Book_update', secondary=update_edition_mapping)
     author = relationship('Author', secondary=edition_author_mapping)
     # relationship: this will not exist as a field in the 'editions' table, it establishes a relationship object.
     # The first arg is the table it relates to (through the mapping table)
@@ -250,7 +251,7 @@ def ensure_set(obj): # TODO: could return False otherwise?
         return obj
 
 def book_and_relationships_creator_and_adder(book_record_instance, session):
-    record = Book_record_declarative(book_record_instance)
+    record = Book_update(book_record_instance)
     edition = get_edition(book_record_instance, session)
     record.edition = [edition]
     author = get_author(book_record_instance.Author, session)
@@ -267,9 +268,9 @@ def book_and_relationships_creator_and_adder(book_record_instance, session):
     return record
 
 
-def list_and_relationships_creator_and_adder(scraped_list_url, type_arg, details_arg, book_records, session):
+def list_and_relationships_creator_and_adder(scraped_list_url, type_arg, details_arg, book_updates, session):
     book_list = get_book_list(scraped_list_url, type_arg, details_arg, session)
-    book_list.books += book_records # updates appends to mapping table for that list rather than overwriting
+    book_list.book_updates += book_updates # updates appends to mapping table for that list rather than overwriting
     session.add(book_list)
     return book_list
 
@@ -280,8 +281,8 @@ def initialise_session():
     return session_maker()
 
 def create_and_commit_data(books, scraped_list_url, type_arg, details_arg, session):
-    book_records = [book_and_relationships_creator_and_adder(book, session) for book in books]
-    list_and_relationships_creator_and_adder(scraped_list_url, type_arg, details_arg, book_records, session)
+    book_updates = [book_and_relationships_creator_and_adder(book, session) for book in books]
+    list_and_relationships_creator_and_adder(scraped_list_url, type_arg, details_arg, book_updates, session)
     session.commit()
     #TODO: log how many records added vs length of book list
 
