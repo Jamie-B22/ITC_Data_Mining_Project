@@ -7,7 +7,6 @@ Author: Jamie Bamforth
 from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, DECIMAL, Table
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
-# TODO: add to install instructions: ensure using 64bit version of python for mysqlclient install
 import csv
 import stdiomask
 from Class_book_record import BookRecord
@@ -19,7 +18,7 @@ USER = input('MySQL Username:')
 # masks password when run from terminal (will not mask when run in python console)
 PASSWORD = stdiomask.getpass('MySQL Password:', mask='*')  
 SQL_LANGUAGE_CONNECTION = f'mysql://{USER}:{PASSWORD}@localhost/goodreads_data'
-Base = declarative_base()  # TODO: can this be in the main fn?
+Base = declarative_base()
 
 edition_author_mapping = Table(
     "edition_author_mapping",
@@ -130,8 +129,7 @@ class Genre(Base):
 class Description(Base):
     __tablename__ = 'descriptions'
     id = Column('id', Integer, primary_key=True)
-    description = Column('description',
-                         String(10000))  # TODO: deal with error where string is too long (truncate str[:10000])
+    description = Column('description',String(10000))  # TODO: deal with error where string is too long (truncate str[:10000])
     book_updates = relationship('BookUpdate', secondary=update_description_mapping)
 
     def __init__(self, description):
@@ -256,8 +254,10 @@ def get_book_list(list_url, list_type, list_details, session):
 def ensure_set(obj):  # TODO: could return False otherwise?
     if isinstance(obj, str):
         return {elem for elem in obj.strip("{'|'}").split("', '")}
-    else:
+    elif isinstance(obj, set):
         return obj
+    else:
+        return None
 
 
 def book_and_relationships_creator_and_adder(book_record_instance, session):

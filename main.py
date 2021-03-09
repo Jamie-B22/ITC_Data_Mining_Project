@@ -58,11 +58,9 @@ def args_dict():
     return type_detail
 
 
-def list_url(l_type, l_detail):
+def list_url(l_type, l_detail): # TODO: remove this as redundant now we have the argparser
     """ Creates the URL of a Goodreads list based on system arguments.
     Defaults to most read this week in local country if none entered. """
-    # TODO: Before next checkpoint add in choices and help statements as in command calculator exercise
-    # TODO: Before next checkpoint add in errors for incorrectly entered arguments
 
     if l_type == "most-popular":
         return BASE_URL + "book/popular_by_date/" + str(l_detail)[:YEAR_INDEX] + "/" + str(l_detail)[YEAR_INDEX:]
@@ -91,7 +89,7 @@ def scrape_books_from_list(book_id_list):
     return book_data
 
 
-def write_to_csv(book_data):
+def write_to_csv(book_data): # TODO: remove this as redundant now we have the Db
     """Take a list of Book_Record objects and save each Book_record as a row in a CSV."""
     logger.debug(f'Saving scraped data in {OUTPUT_FILE_NAME}.')
     keys = book_data[0].__dict__.keys()
