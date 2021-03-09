@@ -1,6 +1,6 @@
 from Goodreads_book_scraper import book_scraper
 from Goodreads_list_scraper import list_scraper
-from Class_book_record import Book_Record
+from Class_book_record import BookRecord
 from SQL_uploader import update_db
 from config import *
 import datetime as dt
@@ -14,7 +14,8 @@ logger = logging.getLogger('main')
 logger.setLevel(logging.DEBUG)
 
 # Create Formatter
-formatter = logging.Formatter('%(asctime)s-%(levelname)s-FILE:%(filename)s-FUNC:%(funcName)s-LINE:%(lineno)d-%(message)s')
+formatter = logging.Formatter(
+    '%(asctime)s-%(levelname)s-FILE:%(filename)s-FUNC:%(funcName)s-LINE:%(lineno)d-%(message)s')
 
 # create a file handler and add it to logger
 file_handler = logging.FileHandler('main.log')
@@ -66,7 +67,8 @@ def list_url(l_type, l_detail):
     if l_type == "most-popular":
         return BASE_URL + "book/popular_by_date/" + str(l_detail)[:YEAR_INDEX] + "/" + str(l_detail)[YEAR_INDEX:]
     if l_type == "most-read":
-        return BASE_URL + "book/most_read?category=all&country=" + str(l_detail)[:COUNTRY_INDEX] + "&duration=" + str(l_detail)[-1]
+        return BASE_URL + "book/most_read?category=all&country=" \
+               + str(l_detail)[:COUNTRY_INDEX] + "&duration=" + str(l_detail)[-1]
     if l_type == "new-releases":
         return BASE_URL + "genres/new_releases/" + str(l_detail)
     if l_type == "custom-list":
@@ -75,14 +77,14 @@ def list_url(l_type, l_detail):
         return BASE_URL + "book/most_read"
 
 
-def scrape_books_from_list(book_ID_list):
+def scrape_books_from_list(book_id_list):
     """Take a list of Goodreads book IDs and scrape the data from the book webpages. Return a list of Book_Record
     objects that contain the scraped data."""
     book_data = []
     try:
-        for book_ID in book_ID_list:
+        for book_ID in book_id_list:
             book_data_dict = book_scraper(book_ID)
-            book_data.append(Book_Record(book_data_dict))
+            book_data.append(BookRecord(book_data_dict))
             # print(book_data[-1].__dict__)
     except ConnectionError as err:
         logger.error(f'Failure to scrape book. {err}')
@@ -107,20 +109,19 @@ def main():
     start_time = time.time()
     logger.info(f"Program started at {dt.datetime.now()}")
 
-    # book_ID_list = list_scraper('http://www.goodreads.com/book/popular_by_date/2020/11')
-
     command_dict = args_dict()
     list_type = command_dict["list_type"]
     list_detail = command_dict["list_detail"]
     goodreads_url = list_url(list_type, list_detail)
 
-    book_ID_list = list_scraper(goodreads_url)
+    book_id_list = list_scraper(goodreads_url)
 
-    book_data = scrape_books_from_list(book_ID_list)
+    book_data = scrape_books_from_list(book_id_list)
 
     time_taken = round(time.time() - start_time, 2)
     if len(book_data) != 0:
-        logger.info(f'Took {time_taken}s to scrape {len(book_data)} books, {round(time_taken/len(book_data),2)}s per book.')
+        logger.info(f'Took {time_taken}s to scrape {len(book_data)} books,'
+                    f' {round(time_taken/len(book_data),2)}s per book.')
         # write_to_csv(book_data)
         update_db(book_data, goodreads_url, list_type, list_detail)
 
