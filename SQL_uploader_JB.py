@@ -9,15 +9,15 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship, backref
 #TODO: add to install instructions: ensure using 64bit version of python for mysqlclient install
 import csv
-import json
+import stdiomask
 from Class_book_record import Book_Record
 
 #TODO: does session object need to be passed to functions it is used in?
 #TODO: change dates to date type
 #TODO: documentation and justification on why columns are in tables at the top. Explain that 'get' fns are to prevent duplicates in those tables
-user = 'root'
-password = 'Logout22' #TODO: make this user input?
-SQL_LANGUAGE_CONNECTION = f'mysql://{user}:{password}@localhost/goodreads_data'
+USER = input('MySQL Username:')
+PASSWORD = stdiomask.getpass('MySQL Password:', mask='*') #masks password when run from terminal (will not mask when run in python console)
+SQL_LANGUAGE_CONNECTION = f'mysql://{USER}:{PASSWORD}@localhost/goodreads_data'
 Base = declarative_base() #TODO: can this be in the main fn?
 
 edition_author_mapping = Table(
