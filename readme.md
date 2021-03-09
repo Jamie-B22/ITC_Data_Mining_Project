@@ -6,7 +6,7 @@
 
 This web scraper finds, scrapes and stores details of books from Goodreads (https://www.goodreads.com/). It works by taking the user's selection of a goodreads list and scraping and storing the details of all books on that list.
 
-The web scraper was created as a project as part of the Data Science Pellows Program at ITC (https://www.itc.tech/).
+The web scraper was created as a project as part of the Data Science Fellows Program at ITC (https://www.itc.tech/).
 
 ### Usage
 

@@ -6,8 +6,6 @@ Authors: Jamie Bamforth and Jordan Ribbans
 
 import requests
 import bs4
-import time
-import random
 
 
 def request_get(list_url, proxy_address=None):
