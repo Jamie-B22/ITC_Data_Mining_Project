@@ -146,3 +146,5 @@ cython_debug/
 # Jordan's files:
 scribbling.py
 20210218_book_data.csv
+test_book_data.csv
+main.log
