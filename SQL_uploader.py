@@ -154,7 +154,7 @@ class Genre(Base):
 class Description(Base):
     __tablename__ = 'descriptions'
     id = Column('id', Integer, primary_key=True)
-    description = Column('description', String(10000))  # TODO: deal with error where string is too long (truncate str[:10000])
+    description = Column('description', String(10000))  # TODO:deal with error string is too long (truncate str[:10000])
     book_updates = relationship('BookUpdate', secondary=update_description_mapping)
 
     def __init__(self, description):
@@ -214,9 +214,12 @@ class Edition(Base):
 
 
 # =============== Functions are below this line, SQLAlchemy classes and tables above ===============
-
+# all get functions are intended to check if the object already exists in the database, returning the existing object if
+# exists, a new one if it doesn't.
 
 def get_author(author_name, session):
+    """Checks if an author of author_name exists in the db already. If exists, returns that author object, if not
+    creates and returns a new one."""
     qry = session.query(Author).filter(Author.name == author_name).all()
     if len(qry) == 0:
         author = Author(author_name)
@@ -226,6 +229,8 @@ def get_author(author_name, session):
 
 
 def get_series(series_name, session):
+    """Checks if series of series_name exists in the db already. If exists, returns that series object, if not
+    creates and returns a new one."""
     qry = session.query(Series).filter(Series.name == series_name).all()
     if len(qry) == 0:
         series = Series(series_name)
@@ -235,6 +240,8 @@ def get_series(series_name, session):
 
 
 def get_genre(genre_name, session):
+    """Checks if a genre of genre_name exists in the db already. If exists, returns that genre object, if not
+    creates and returns a new one."""
     qry = session.query(Genre).filter(Genre.name == genre_name).all()
     if len(qry) == 0:
         genre = Genre(genre_name)
@@ -244,10 +251,13 @@ def get_genre(genre_name, session):
 
 
 def get_genre_collection(genres, session):
+    """Takes list of genre strings and returns a list of the appropriate Genre instances."""
     return [get_genre(genre, session) for genre in genres]
 
 
 def get_description(description_text, session):
+    """Checks if a description of description_text exists in the db already. If exists, returns that description object,
+    if not creates and returns a new one."""
     qry = session.query(Description).filter(Description.description == description_text).all()
     if len(qry) == 0:
         description = Description(description_text)
@@ -257,6 +267,8 @@ def get_description(description_text, session):
 
 
 def get_edition(book_record_instance, session):
+    """Checks if the edition of book_record_instance exists in the db already. If exists, returns that edition object,
+    if not creates and returns a new one."""
     qry = session.query(Edition).filter(Edition.goodreads_id == book_record_instance.Book_ID and
                                         Edition.title == book_record_instance.Title and
                                         Edition.format == book_record_instance.Format).all()
@@ -268,6 +280,8 @@ def get_edition(book_record_instance, session):
 
 
 def get_book_list(list_url, list_type, list_details, session):
+    """Checks if a the list associated with list_url exists in the db already. If exists, returns that list object, if
+    not creates and returns a new one."""
     qry = session.query(List).filter(List.url == list_url).all()
     if len(qry) == 0:
         book_list = List(list_url, list_type, list_details)
@@ -277,6 +291,9 @@ def get_book_list(list_url, list_type, list_details, session):
 
 
 def ensure_set(obj):
+    """Takes an object and returns that object as a set if the ibject is a set or the JSON string encoding of a set,
+    else returns None. The use case for this is when extracting sets that have been uploaded to csv and converting them
+    back to a set object."""
     if isinstance(obj, str):
         return {elem for elem in obj.strip("{'|'}").split("', '")}
     elif isinstance(obj, set):
@@ -286,6 +303,10 @@ def ensure_set(obj):
 
 
 def book_and_relationships_creator_and_adder(book_record_instance, session):
+    """Takes book_record_instance and uses its parameters to create a new or update an existing Edition, BookUpdate,
+    Author, Series, Genre and Descrition objects. It then adds the relevant relationships btween objects adding the
+    relationships to the BookUpdate (book_updates) objects. Returns the BookUpdate instance."""
+    # TODO: split into instance creator and relationships creator?
     record = BookUpdate(book_record_instance)
     edition = get_edition(book_record_instance, session)
     record.edition = [edition]
@@ -307,6 +328,8 @@ def book_and_relationships_creator_and_adder(book_record_instance, session):
 
 
 def list_and_relationships_creator_and_adder(list_url, list_type, list_details, book_updates, session):
+    """Takes list information (list_url, list_type, list_details) and creates a new or updates an existing List object,
+    adding the relationships to the BookUpdate (book_updates) objects. Returns the List instance."""
     book_list = get_book_list(list_url, list_type, list_details, session)
     book_list.book_updates += book_updates  # updates appends to mapping table for that list rather than overwriting
     session.add(book_list)
@@ -314,6 +337,7 @@ def list_and_relationships_creator_and_adder(list_url, list_type, list_details, 
 
 
 def initialise_session():
+    """Intitalise SQLAlchemy engine and session to allow uploading of records to the db. Returns the sessionmaker()."""
     engine = create_engine(SQL_LANGUAGE_CONNECTION, echo=False)
     Base.metadata.create_all(bind=engine)
     session_maker = sessionmaker(bind=engine)
@@ -321,6 +345,8 @@ def initialise_session():
 
 
 def create_and_commit_data(books, list_url, list_type, list_details, session):
+    """Takes book and list details and calls functions that creates individual book records and a list record in the db
+    and their relationships."""
     book_updates = [book_and_relationships_creator_and_adder(book, session) for book in books]
     list_and_relationships_creator_and_adder(list_url, list_type, list_details, book_updates, session)
     session.commit()
@@ -328,6 +354,9 @@ def create_and_commit_data(books, list_url, list_type, list_details, session):
 
 
 def update_db(books, list_url, list_type, list_details):
+    """Take a list of book record instances (books) and the Goodreads list details in which the books were found in
+    (list_url, list_type, list_details) and upload these to the database. If a connection cannot be made with the
+    database, raise a connection error that will be handled in main.py to upload the book details to a backup csv."""
     logger.info(f'Uploading {len(books)} to database.')
     # Next comment is to remove PyCharm warning, this broad exception is intentional.
     # noinspection PyBroadException
@@ -338,11 +367,12 @@ def update_db(books, list_url, list_type, list_details):
         session.close()
         logger.debug(f'Database connection session closed.')
     except Exception:
-        raise ConnectionError('Failed to connect to database.')
         logger.error(f'Unable to initialise connection to database, data not saved in database.')
+        raise ConnectionError('Failed to connect to database.')
 
 
 if __name__ == '__main__':
+    # for initial testing only, will only run properly on a computer with the test csv.
     with open('20210121_book_data_b.csv', 'r', newline='') as file:
         reader = csv.DictReader(file)
         test_books = [BookRecord(book) for book in reader]
