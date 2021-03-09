@@ -1,7 +1,7 @@
 from Goodreads_book_scraper import book_scraper
 from Goodreads_list_scraper import list_scraper
 from Class_book_record import Book_Record
-from SQL_uploader_JB import update_db
+from SQL_uploader import update_db
 from config import *
 import datetime as dt
 import time
@@ -122,7 +122,7 @@ def main():
     if len(book_data) != 0:
         logger.info(f'Took {time_taken}s to scrape {len(book_data)} books, {round(time_taken/len(book_data),2)}s per book.')
         # write_to_csv(book_data)
-        update_db(book_data, goodreads_url, list_type, list_detail) #TODO: get type and details args
+        update_db(book_data, goodreads_url, list_type, list_detail)
 
 
 if __name__ == '__main__':

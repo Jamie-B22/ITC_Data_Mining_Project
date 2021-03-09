@@ -36,7 +36,6 @@ PAGES_WORD_INDEX_IN_TEXT = 0
 THROTTLING_STATUS_CODE = 403
 
 
-
 def date_from_text(date_text):
     """Takes a string with the components of the date existing somewhere in the string and returns the date string in
     format YYYY-MM-DD. Date components in date_text will be in format:
@@ -48,7 +47,8 @@ def date_from_text(date_text):
     # regex patterns used to find date components
     day_pattern = re.compile(r'\b[0-9]{1,2}[a-zA-Z][a-zA-Z]\b')
     month_pattern = re.compile(
-        "(jan(uary)?|feb(ruary)?|mar(ch)?|apr(il)?|may|jun(e)?|jul(y)?|aug(ust)?|sep(tember)?|oct(ober)?|nov(ember)?|dec(ember)?)")
+        "(jan(uary)?|feb(ruary)?|mar(ch)?|apr(il)?|may|jun(e)?|jul(y)?|aug(ust)?|sep(tember)?|oct(ober)?|nov("
+        "ember)?|dec(ember)?)")
     year_pattern = re.compile(r'[0-9]{4}')
 
     # find component strings
@@ -57,9 +57,9 @@ def date_from_text(date_text):
     year = year_pattern.search(date_text).group()
 
     # check which components exist and return correct date string
-    if month == None:
+    if month is None:
         return year
-    elif day == None:
+    elif day is None:
         month = month.group().title()
         return datetime.strptime(' '.join([month, year]), '%B %Y').strftime('%Y-%m')
     else:
@@ -78,7 +78,10 @@ def get_title(book_page_soup):
 def get_format(book_page_soup):
     """Takes the HTML Beautiful Soup object of a Goodreads book page and returns the format of the book as a string."""
     elem = book_page_soup.find('span', {'itemprop': 'bookFormat'})
-    return elem.text.encode('ascii', errors='ignore').decode('utf-8')
+    if elem is None:
+        return None
+    else:
+        return elem.text.encode('ascii', errors='ignore').decode('utf-8')
 
 
 def get_series(book_page_soup):
@@ -108,7 +111,10 @@ def get_author(book_page_soup):
     """Takes the HTML Beautiful Soup object of a Goodreads book page and returns Author as a string."""
     selector = '#bookAuthors > span:nth-child(2) > div > a > span'
     elems = book_page_soup.select(selector)
-    return elems[0].text.encode('ascii', errors='ignore').decode('utf-8')
+    if len(elems) == 0:
+        return None
+    else:
+        return elems[0].text.encode('ascii', errors='ignore').decode('utf-8')
 
 
 def get_rating(book_page_soup):
@@ -121,7 +127,8 @@ def get_rating(book_page_soup):
 def get_release_date(book_page_soup):
     """Takes the HTML Beautiful Soup object of a Goodreads book page and returns release date as a string."""
     elems = book_page_soup.find('div', {'id': 'details'}).find_all('div')
-    date_text = elems[RELEASE_DATE_ELEMENT_ROW].text.split('\n')[RELEASE_DATE_TEXT_LINE]  # excludes first publised date if exists
+    date_text = elems[RELEASE_DATE_ELEMENT_ROW].text.split('\n')[RELEASE_DATE_TEXT_LINE]
+    # excludes first published date if exists
     return date_from_text(date_text)
 
 
@@ -129,7 +136,7 @@ def get_first_published_date(book_page_soup):
     """Takes the HTML Beautiful Soup object of a Goodreads book page and returns the first published date as a string.
     If this is the first edition/release of the book, will return None."""
     elem = book_page_soup.find('div', {'id': 'details'}).find('nobr')
-    if elem == None:
+    if elem is None:
         return None
     else:
         return date_from_text(elem.text)
@@ -139,14 +146,20 @@ def get_num_ratings(book_page_soup):
     """Takes the HTML Beautiful Soup object of a Goodreads book page and returns the number of ratings on Goodreads as
     an int."""
     elem = book_page_soup.find('meta', {'itemprop': 'ratingCount'})
-    return int(elem['content'])
+    if elem is None:
+        return None
+    else:
+        return int(elem['content'])
 
 
 def get_num_reviews(book_page_soup):
     """Takes the HTML Beautiful Soup object of a Goodreads book page and returns the number of reviews on Goodreads as
     an int."""
     elem = book_page_soup.find('meta', {'itemprop': 'reviewCount'})
-    return int(elem['content'])
+    if elem is None:
+        return None
+    else:
+        return int(elem['content'])
 
 
 def get_description(book_page_soup):
@@ -154,14 +167,17 @@ def get_description(book_page_soup):
     a string."""
     selector = '#description'
     elems = book_page_soup.select(selector)
-    return elems[0].text.strip().rstrip('..more').strip().encode('ascii', errors='ignore').decode('utf-8')
+    if len(elems) == 0:
+        return None
+    else:
+        return elems[0].text.strip().rstrip('..more').strip().encode('ascii', errors='ignore').decode('utf-8')
 
 
 def get_num_pages(book_page_soup):
     """Takes the HTML Beautiful Soup object of a Goodreads book page and returns the number of pages as an int. If this
     information does not exist on Goodreads, returns None."""
     elem = book_page_soup.find('span', {'itemprop': 'numberOfPages'})
-    if elem == None:
+    if elem is None:
         return None
     else:
         return int(elem.text.split()[PAGES_WORD_INDEX_IN_TEXT])
@@ -176,14 +192,15 @@ def get_genre(book_page_soup):
     return genres
 
 
-################# Above this line are all functions to extract the data from the Beautiful Soup object #################
+# =============== Above this line are all functions to extract the data from the Beautiful Soup object ===============
 
-def request_book_page_html(Book_ID, proxy_address):
+def request_book_page_html(book_id):
     """Takes the Goodreads book ID and proxy address (format [IP address]:[port], or may be None) and returns a request
     object built from the Goodreads webpage for the book ID."""
-    url = ROOT_BOOK_URL + Book_ID
+    url = ROOT_BOOK_URL + book_id
     headers_list = [
-        'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.62 Safari/537.36',
+        'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.62 '
+        'Safari/537.36',
         'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36',
         'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.71 Safari/537.36']
     headers = {"user-agent": random.choice(headers_list)}
@@ -191,18 +208,21 @@ def request_book_page_html(Book_ID, proxy_address):
 
     if book_page.status_code >= 300:
         if book_page.status_code == THROTTLING_STATUS_CODE:
-            raise ConnectionError(f'Throttled by Goodreads. Failure of request to url {url}. Status code: {book_page.status_code} Error')
+            raise ConnectionError(
+                f'Throttled by Goodreads. Failure of request to url {url}. Status code: {book_page.status_code} Error')
         else:
             raise ConnectionError(f'Failure of request to url {url}. Status code: {book_page.status_code} Error')
     return book_page
 
 
-def parse_page_html(Book_ID, book_page_soup):
+def parse_page_html(book_id, book_page_soup):
     """Takes the Goodreads book ID and HTML Beautiful Soup object of a Goodreads book page and retracts the relevant
     book data, returning a dictionary of the book data."""
     book_data = dict()
     book_data[
-        'Book_ID'] = Book_ID  # keep as string for convenience of use and in case leading zeros make a difference e.g. there may be book 5598 and book 05598
+        'Book_ID'] = book_id
+    # keep book_id as string for convenience of use and in case leading zeros make a difference
+    # e.g. there may be book 5598 and book 05598
     book_data['Title'] = get_title(book_page_soup)
     book_data['Author'] = get_author(book_page_soup)
     book_data['Format'] = get_format(book_page_soup)
@@ -222,14 +242,14 @@ def parse_page_html(Book_ID, book_page_soup):
     return book_data
 
 
-def book_scraper(Book_ID, proxy_address=None):
+def book_scraper(book_id):
     """Takes a Goodreads book ID and an optional proxy address (format [IP address]:[port]) and returns a dictionary of
     book data scraped from the Goodreads webpage for the book ID."""
-    print(f'Scraping book {Book_ID}')
+    print(f'Scraping book {book_id}')
 
-    book_page = request_book_page_html(Book_ID, proxy_address)
+    book_page = request_book_page_html(book_id)
     book_page_soup = bs4.BeautifulSoup(book_page.text, 'html.parser')
-    book_data = parse_page_html(Book_ID, book_page_soup)
+    book_data = parse_page_html(book_id, book_page_soup)
 
     time.sleep(ANTI_THROTTLE_DELAY_S + random.randint(0, 1))  # to avoid throttling, 9s wasn't enough
     return book_data
@@ -238,6 +258,17 @@ def book_scraper(Book_ID, proxy_address=None):
 def book_scraper_tests():
     """Tests scraper against data that should not change, eg. title, author, number of pages.
     Some data such as qty reviews will change live and so is not tested."""
+    # test book ID 38599259
+    book_data = book_scraper('38599259')
+    assert book_data['Book_ID'] == '38599259'
+    assert book_data['Title'] == 'Black Girl Unlimited'
+    assert book_data['Author'] == 'Echo Brown'
+    assert book_data['Format'] is None
+    assert book_data['Series'] is None
+    assert book_data['Number_in_series'] is None
+    assert book_data['Release_date'] == '2020-01-14'
+    assert book_data['First_published_date'] is None
+    assert book_data['Qty_pages'] == 304
     # test book ID 186074
     book_data = book_scraper('186074')
     assert book_data['Book_ID'] == '186074'
@@ -268,14 +299,13 @@ def book_scraper_tests():
     assert book_data['Title'] == 'Tsarina'
     assert book_data['Author'] == 'Ellen Alpsten'
     assert book_data['Format'] == 'Hardcover'
-    assert book_data['Series'] == None
-    assert book_data['Number_in_series'] == None
+    assert book_data['Series'] is None
+    assert book_data['Number_in_series'] is None
     assert book_data['Release_date'] == '2020-11-10'
     assert book_data['First_published_date'] == '2002'
     assert book_data['Qty_pages'] == 467
 
     print('book_scraper() tests successful')
-
 
 
 if __name__ == '__main__':

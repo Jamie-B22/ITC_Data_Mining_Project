@@ -4,15 +4,14 @@ Functions and SQLAlchemy classes and for defining database and enabling upload t
 Author: Jamie Bamforth
 """
 
-from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, DateTime, Date, DECIMAL, Table
+from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, DECIMAL, Table
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, relationship, backref
+from sqlalchemy.orm import sessionmaker, relationship
 #TODO: add to install instructions: ensure using 64bit version of python for mysqlclient install
 import csv
 import stdiomask
 from Class_book_record import Book_Record
 
-#TODO: does session object need to be passed to functions it is used in?
 #TODO: change dates to date type
 #TODO: documentation and justification on why columns are in tables at the top. Explain that 'get' fns are to prevent duplicates in those tables
 USER = input('MySQL Username:')
@@ -185,7 +184,7 @@ class Edition(Base):
         return str(self.__dict__.values())
 
 
-############## Functions below this line, SQLAlchemy classes and tables above ################
+# =============== Functions are below this line, SQLAlchemy classes and tables above ===============
 
 
 def get_author(author_name, session):
@@ -275,7 +274,7 @@ def list_and_relationships_creator_and_adder(scraped_list_url, type_arg, details
     return book_list
 
 def initialise_session():
-    engine = create_engine(SQL_LANGUAGE_CONNECTION, echo=True)
+    engine = create_engine(SQL_LANGUAGE_CONNECTION, echo=False)
     Base.metadata.create_all(bind=engine)
     session_maker = sessionmaker(bind=engine)
     return session_maker()
