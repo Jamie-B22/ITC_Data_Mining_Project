@@ -251,7 +251,7 @@ def get_book_list(list_url, list_type, list_details, session):
     return book_list
 
 
-def ensure_set(obj):  # TODO: could return False otherwise?
+def ensure_set(obj):
     if isinstance(obj, str):
         return {elem for elem in obj.strip("{'|'}").split("', '")}
     elif isinstance(obj, set):
@@ -272,8 +272,9 @@ def book_and_relationships_creator_and_adder(book_record_instance, session):
     book_record_instance.Genres = ensure_set(book_record_instance.Genres)
     genres_collection = get_genre_collection(book_record_instance.Genres, session)
     edition.genres = genres_collection
-    description = get_description(book_record_instance.Description, session) 
-    # TODO: put somewhere that desciption only exists as a separate table is to save mamory,
+    description = get_description(book_record_instance.Description, session)
+    # TODO: log if this was successful and add a debug level with issues.
+    # TODO: put somewhere that description only exists as a separate table is to save memory,
     #  each description is associated with multiple book title pulls.
     record.description = [description]
     session.add(record)
