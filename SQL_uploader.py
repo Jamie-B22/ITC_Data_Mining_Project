@@ -7,17 +7,18 @@ Author: Jamie Bamforth
 from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, DECIMAL, Table
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
-#TODO: add to install instructions: ensure using 64bit version of python for mysqlclient install
+# TODO: add to install instructions: ensure using 64bit version of python for mysqlclient install
 import csv
 import stdiomask
 from Class_book_record import Book_Record
 
-#TODO: change dates to date type
-#TODO: documentation and justification on why columns are in tables at the top. Explain that 'get' fns are to prevent duplicates in those tables
+# TODO: change dates to date type
+# TODO: documentation and justification on why columns are in tables at the top. Explain that 'get' fns are to prevent duplicates in those tables
 USER = input('MySQL Username:')
-PASSWORD = stdiomask.getpass('MySQL Password:', mask='*') #masks password when run from terminal (will not mask when run in python console)
+PASSWORD = stdiomask.getpass('MySQL Password:',
+                             mask='*')  # masks password when run from terminal (will not mask when run in python console)
 SQL_LANGUAGE_CONNECTION = f'mysql://{USER}:{PASSWORD}@localhost/goodreads_data'
-Base = declarative_base() #TODO: can this be in the main fn?
+Base = declarative_base()  # TODO: can this be in the main fn?
 
 edition_author_mapping = Table(
     "edition_author_mapping",
@@ -63,10 +64,11 @@ update_edition_mapping = Table(
     Column("edition_id", Integer, ForeignKey("editions.id"))
 )
 
+
 class Book_update(Base):
     __tablename__ = 'book_updates'
     id = Column('id', Integer, primary_key=True)
-    rating = Column('rating', DECIMAL(3,2))
+    rating = Column('rating', DECIMAL(3, 2))
     qty_ratings = Column('qty_ratings', Integer)
     qty_reviews = Column('qty_reviews', Integer)
     scrape_datetime = Column('scrape_datetime', String(25))
@@ -97,6 +99,7 @@ class Author(Base):
     def __str__(self):
         return f'{self.id}, {self.name}'
 
+
 class Series(Base):
     __tablename__ = 'series'
     id = Column('id', Integer, primary_key=True)
@@ -126,7 +129,8 @@ class Genre(Base):
 class Description(Base):
     __tablename__ = 'descriptions'
     id = Column('id', Integer, primary_key=True)
-    description = Column('description', String(10000)) #TODO: deal with error where string is too long (truncate str[:10000])
+    description = Column('description',
+                         String(10000))  # TODO: deal with error where string is too long (truncate str[:10000])
     book_updates = relationship('Book_update', secondary=update_description_mapping)
 
     def __init__(self, description):
@@ -152,6 +156,7 @@ class List(Base):
     def __str__(self):
         return f'{self.id}, {self.type}, {self.details}, {self.url}'
 
+
 class Edition(Base):
     __tablename__ = 'editions'
     id = Column('id', Integer, primary_key=True)
@@ -173,7 +178,7 @@ class Edition(Base):
 
     def __init__(self, book_record_instance):
         self.goodreads_id = book_record_instance.Book_ID
-        self.title = book_record_instance.Title#.encode('UTF-16', errors='replace')
+        self.title = book_record_instance.Title  # .encode('UTF-16', errors='replace')
         self.format = book_record_instance.Format
         self.number_in_series = book_record_instance.Number_in_series
         self.release_date = book_record_instance.Release_date
@@ -195,6 +200,7 @@ def get_author(author_name, session):
         author = qry[0]
     return author
 
+
 def get_series(series_name, session):
     qry = session.query(Series).filter(Series.name == series_name).all()
     if len(qry) == 0:
@@ -202,6 +208,7 @@ def get_series(series_name, session):
     else:
         series = qry[0]
     return series
+
 
 def get_genre(genre_name, session):
     qry = session.query(Genre).filter(Genre.name == genre_name).all()
@@ -215,14 +222,16 @@ def get_genre(genre_name, session):
 def get_genre_collection(genres, session):
     return [get_genre(genre, session) for genre in genres]
 
+
 def get_description(description_text, session):
-    #description_text = description_text.encode('UTF-16', errors='replace') # ensure any non-UTF-8 characters are removed to ensure compatiability
+    # description_text = description_text.encode('UTF-16', errors='replace') # ensure any non-UTF-8 characters are removed to ensure compatiability
     qry = session.query(Description).filter(Description.description == description_text).all()
     if len(qry) == 0:
         description = Description(description_text)
     else:
         description = qry[0]
     return description
+
 
 def get_edition(book_record_instance, session):
     qry = session.query(Edition).filter(Edition.goodreads_id == book_record_instance.Book_ID and
@@ -234,6 +243,7 @@ def get_edition(book_record_instance, session):
         edition = qry[0]
     return edition
 
+
 def get_book_list(scraped_list_url, type_arg, details_arg, session):
     qry = session.query(List).filter(List.url == scraped_list_url).all()
     if len(qry) == 0:
@@ -243,11 +253,12 @@ def get_book_list(scraped_list_url, type_arg, details_arg, session):
     return book_list
 
 
-def ensure_set(obj): # TODO: could return False otherwise?
+def ensure_set(obj):  # TODO: could return False otherwise?
     if isinstance(obj, str):
         return {elem for elem in obj.strip("{'|'}").split("', '")}
     else:
         return obj
+
 
 def book_and_relationships_creator_and_adder(book_record_instance, session):
     record = Book_update(book_record_instance)
@@ -261,7 +272,8 @@ def book_and_relationships_creator_and_adder(book_record_instance, session):
     book_record_instance.Genres = ensure_set(book_record_instance.Genres)
     genres_collection = get_genre_collection(book_record_instance.Genres, session)
     edition.genres = genres_collection
-    description = get_description(book_record_instance.Description, session) # TODO: put somewhere that desciption only exists as a separate tabl is to save mamory, each description is associated with multiple book title pulls.
+    description = get_description(book_record_instance.Description,
+                                  session)  # TODO: put somewhere that desciption only exists as a separate tabl is to save mamory, each description is associated with multiple book title pulls.
     record.description = [description]
     session.add(record)
     return record
@@ -269,9 +281,10 @@ def book_and_relationships_creator_and_adder(book_record_instance, session):
 
 def list_and_relationships_creator_and_adder(scraped_list_url, type_arg, details_arg, book_updates, session):
     book_list = get_book_list(scraped_list_url, type_arg, details_arg, session)
-    book_list.book_updates += book_updates # updates appends to mapping table for that list rather than overwriting
+    book_list.book_updates += book_updates  # updates appends to mapping table for that list rather than overwriting
     session.add(book_list)
     return book_list
+
 
 def initialise_session():
     engine = create_engine(SQL_LANGUAGE_CONNECTION, echo=False)
@@ -279,13 +292,16 @@ def initialise_session():
     session_maker = sessionmaker(bind=engine)
     return session_maker()
 
+
 def create_and_commit_data(books, scraped_list_url, type_arg, details_arg, session):
     book_updates = [book_and_relationships_creator_and_adder(book, session) for book in books]
     list_and_relationships_creator_and_adder(scraped_list_url, type_arg, details_arg, book_updates, session)
     session.commit()
-    #TODO: log how many records added vs length of book list
+    # TODO: log how many records added vs length of book list
+
 
 def update_db(books, scraped_list_url, type_arg, details_arg):
+    # TODO: log uploading to db
     session = initialise_session()
     create_and_commit_data(books, scraped_list_url, type_arg, details_arg, session)
     session.close()
@@ -300,6 +316,3 @@ if __name__ == '__main__':
     type_arg = 'test_type'
     details_arg = 'test_details'
     update_db(test_books, scraped_list_url, type_arg, details_arg)
-
-
-
