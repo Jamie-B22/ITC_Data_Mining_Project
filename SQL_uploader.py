@@ -4,7 +4,7 @@ Functions and SQLAlchemy classes for defining database and enabling upload to th
 Author: Jamie Bamforth
 """
 
-from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, DECIMAL, Table
+from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, DECIMAL, Table, Date
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy import exc
@@ -367,7 +367,7 @@ def create_and_commit_data(books, list_url, list_type, list_details, session):
     book_updates = [book_and_relationships_creator_and_adder(book, session) for book in books]
     list_and_relationships_creator_and_adder(list_url, list_type, list_details, book_updates, session)
     session.commit()
-    logger.info(f'{len(book_updates)} committed to database.')
+    logger.info(f'{len(book_updates)} books committed to database.')
 
 
 def update_db(books, list_url, list_type, list_details):
