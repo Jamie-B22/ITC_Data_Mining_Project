@@ -53,8 +53,12 @@ try:
     engine = create_engine(SQL_LANGUAGE_CONNECTION, echo=False)
     Base.metadata.create_all(bind=engine)
 except exc.OperationalError as engine_err:
+    error_code = str(engine_err).split("(MySQLdb._exceptions.OperationalError) (")[1].split(",")[0]
     logger.error(f'{engine_err}. Unable to create database engine.')
-    raise engine_err
+    if error_code == "2002":
+        pass
+    if error_code in ["1045", "1049"]:
+        raise engine_err
 
 
 edition_author_mapping = Table(
