@@ -4,7 +4,7 @@
 
 ### Description
 
-This web scraper finds, scrapes and stores details of books from [GoodReads](https://www.goodreads.com/). It works by taking the user's selection of a goodreads list and scraping and storing the details of all books on that list. The data will be stored in a MySQL database (structure detailed below), or into a CSV file if it is unable to make a connection to SQL.
+This web scraper finds, scrapes and stores details of books from [GoodReads](https://www.goodreads.com/). It works by taking the user's selection of a goodreads list and scraping and storing the details of all books on that list. The data will be stored in a MySQL database (structure detailed below), or into a CSV file if it is unable to make a connection to the database.
 
 The web scraper was created as a project as part of the Data Science Fellows Program at [ITC](https://www.itc.tech/).
 
@@ -41,12 +41,11 @@ Details about the database structure can be found in the file: [data_dictionary]
 ### Setup Instructions
 #### Database Setup:
 1. A MySQL database is used to store the data and the database upload process in `SQL_uploader.py` in this project has a few components
-   specific to MySQL, so for compatibility MySQL should be installed and used.
+   specific to MySQL, so for compatibility MySQL should be installed and used. Installation instructions can be found [here](https://www.mysqltutorial.org/install-mysql-ubuntu/)
+   for Ubuntu users (similar steps for other Linux distros), for windows there is an installation wizard that can be downloaded [here](https://dev.mysql.com/downloads/installer/).
    
-2. The database and table schema can be created in your MySQL localhost by running the `goodreads_data db and table creation script.sql`
-in SQL. The only strictly necessary step here is to create a database named `goodreads_data` in the highest level of your localhost 
-   as this is what the script will connect to. If the tables fo not exist, the SQLAlchemy package will recognise this when
-    the program is first run and it will create the appropriate schema for you.
+2. The database and table schema should be created in your MySQL localhost and can be created by running the `goodreads_data db and table creation script.sql`
+in SQL.
    
 3. When the scraper is run, it will ask the user for a 'MySQL username' and 'MySQL password'. Enter credentials at this point that 
 have read and write access to the `goodreads_data` database you have created on your localhost.
@@ -55,14 +54,14 @@ have read and write access to the `goodreads_data` database you have created on 
 #### Linux
 1. From the directory the requirements.txt file is located in, run command `pip3 install --user -r requirements.txt`
 2. If there are issues with the installation of the `mysqlclient` library:
-    - If you are on a 64 bit machine ensure that you have the latest 64 bit version of Python3
+    - If you are on a 64 bit machine ensure that you have the latest 64 bit version of Python3.
    - Run commands `sudo apt-get install libmysqlclient-dev`, `sudo apt-get install python3-dev` and `sudo apt-get install gcc`
     to install these packages.
      
 #### Windows
 1. Run command `pip install -r requirements.txt`.
 2. If there are issues with the installation of the `mysqlclient` library:
-    - If you are on a 64 bit machine ensure that you have the latest 64 bit version of Python3
+    - If you are on a 64 bit machine ensure that you have the latest 64 bit version of Python3.
 
 
 ### Authors
