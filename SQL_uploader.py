@@ -187,7 +187,7 @@ def create_and_commit_data(books, list_url, list_type, list_details, session):
 def update_db(books, list_url, list_type, list_details, engine):
     """Take a list of book record instances (books) and the Goodreads list details in which the books were found in
     (list_url, list_type, list_details), create a database session and upload these to the database."""
-    logger.info(f'Uploading {len(books)} books to database.')
+    logger.info(f'Attempting to upload {len(books)} books to database.')
     session = initialise_session(engine)
     create_and_commit_data(books, list_url, list_type, list_details, session)
     session.close()
