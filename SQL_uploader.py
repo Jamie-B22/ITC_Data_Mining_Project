@@ -200,8 +200,8 @@ class Edition(Base):
     title = Column('title', String(250))
     format = Column('format', String(250))
     number_in_series = Column('number_in_series', String(250))
-    release_date = Column('release_date', String(10))
-    first_published_date = Column('first_published_date', String(10))
+    release_date = Column('release_date', Date)
+    first_published_date = Column('first_published_date', Date)
     qty_pages = Column('qty_rpages', Integer)
 
     book_updates = relationship('BookUpdate', secondary=update_edition_mapping)

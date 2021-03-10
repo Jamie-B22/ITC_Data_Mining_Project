@@ -132,8 +132,8 @@ CREATE TABLE `editions` (
   `title` varchar(250) DEFAULT NULL,
   `format` varchar(250) DEFAULT NULL,
   `number_in_series` varchar(250) DEFAULT NULL,
-  `release_date` varchar(10) DEFAULT NULL,
-  `first_published_date` varchar(10) DEFAULT NULL,
+  `release_date` date DEFAULT NULL,
+  `first_published_date` date DEFAULT NULL,
   `qty_rpages` int DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
