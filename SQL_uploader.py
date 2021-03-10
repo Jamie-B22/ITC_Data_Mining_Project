@@ -4,12 +4,9 @@ Functions and SQLAlchemy classes for defining database and enabling upload to th
 Author: Jamie Bamforth
 """
 
-from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, DECIMAL, Table, Date
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, relationship
+from sqlalchemy.orm import sessionmaker
 from sqlalchemy import exc
 import csv
-import stdiomask
 import logging
 import sys
 from Class_book_record import BookRecord
