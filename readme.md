@@ -34,7 +34,7 @@ Parameters:
 
 ### Database Design
 
-<img src="https://raw.githubusercontent.com/Jamie-B22/ITC_Data_Mining_Project/master/ERD.jpg" width="1000">
+<img src="https://raw.githubusercontent.com/Jamie-B22/ITC_Data_Mining_Project/master/ERD.png" width="1000">
 
 Details about the database structure can be found in the file: [data_dictionary](https://github.com/Jamie-B22/ITC_Data_Mining_Project/blob/master/data_dictionary.xlsx)
 
