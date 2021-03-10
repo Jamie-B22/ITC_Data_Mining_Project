@@ -7,6 +7,7 @@ Author: Jamie Bamforth
 from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, DECIMAL, Table
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
+from sqlalchemy import exc
 import csv
 import stdiomask
 import logging
@@ -23,6 +24,7 @@ USER = input('MySQL Username:')
 PASSWORD = stdiomask.getpass('MySQL Password:', mask='*')  
 SQL_LANGUAGE_CONNECTION = f'mysql://{USER}:{PASSWORD}@localhost/goodreads_data'
 Base = declarative_base()
+
 
 
 """Setup Logger"""
@@ -43,6 +45,16 @@ stream_handler = logging.StreamHandler(sys.stdout)
 stream_handler.setLevel(logging.WARNING)
 stream_handler.setFormatter(formatter)
 logger.addHandler(stream_handler)
+
+
+"""Check credentials are correct and database exists before scraping starts.
+    If not raise error to be passed to main.py to communicate to user."""
+try:
+    engine = create_engine(SQL_LANGUAGE_CONNECTION, echo=False)
+    Base.metadata.create_all(bind=engine)
+except exc.OperationalError as engine_err:
+    logger.error(f'{engine_err}. Unable to create database engine.')
+    raise engine_err
 
 
 edition_author_mapping = Table(
@@ -337,11 +349,16 @@ def list_and_relationships_creator_and_adder(list_url, list_type, list_details, 
 
 
 def initialise_session():
-    """Intitalise SQLAlchemy engine and session to allow uploading of records to the db. Returns the sessionmaker()."""
-    engine = create_engine(SQL_LANGUAGE_CONNECTION, echo=False)
-    Base.metadata.create_all(bind=engine)
-    session_maker = sessionmaker(bind=engine)
-    return session_maker()
+    """Intitalise SQLAlchemy engine and session to allow uploading of records to the db. Returns the sessionmaker().
+    If a connection cannot be made with the database, raise an error that will be handled in main.py to upload the book
+    details to a backup csv."""
+    try:
+        session_maker = sessionmaker(bind=engine)
+        return session_maker()
+    except exc.SQLAlchemyError as session_err:
+        logger.error(f'{session_err}. Unable to initialise connection to database, data not saved in database.')
+        raise session_err
+
 
 
 def create_and_commit_data(books, list_url, list_type, list_details, session):
@@ -355,20 +372,14 @@ def create_and_commit_data(books, list_url, list_type, list_details, session):
 
 def update_db(books, list_url, list_type, list_details):
     """Take a list of book record instances (books) and the Goodreads list details in which the books were found in
-    (list_url, list_type, list_details) and upload these to the database. If a connection cannot be made with the
-    database, raise a connection error that will be handled in main.py to upload the book details to a backup csv."""
+    (list_url, list_type, list_details), create a database session and upload these to the database."""
     logger.info(f'Uploading {len(books)} to database.')
-    # Next comment is to remove PyCharm warning, this broad exception is intentional.
-    # noinspection PyBroadException
-    try:
-        session = initialise_session()
-        logger.debug(f'Database connection session initialised.')
-        create_and_commit_data(books, list_url, list_type, list_details, session)
-        session.close()
-        logger.debug(f'Database connection session closed.')
-    except Exception:
-        logger.error(f'Unable to initialise connection to database, data not saved in database.')
-        raise ConnectionError('Failed to connect to database.')
+    session = initialise_session()
+    logger.debug(f'Database connection session initialised.')
+    create_and_commit_data(books, list_url, list_type, list_details, session)
+    session.close()
+    logger.debug(f'Database connection session closed.')
+
 
 
 if __name__ == '__main__':

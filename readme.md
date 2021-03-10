@@ -36,9 +36,6 @@ Where:
 #### Database Setup:
 1. A MySQL database is used to store the data and the database upload process in `SQL_uploader.py` in this project has a few components
    specific to MySQL, so for compatibility MySQL should be installed and used.
-   *Note that to connect to a MySQL database from SQLAlchemy in Python the `mysqlclient` package is used. Users running a 
-   32 bit version of Python 3 on a 64 bit machine will have major issues installing and importing `mysql` client unless 
-   they install and use a 64 bit version of Python 3.*
    
 2. The database and table schema can be created in your MySQL localhost by running the `goodreads_data db and table creation script.sql`
 in SQL. The only strictly necessary step here is to create a database named `goodreads_data` in the highest level of your localhost 
