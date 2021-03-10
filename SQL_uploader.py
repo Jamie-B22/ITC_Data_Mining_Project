@@ -33,10 +33,6 @@ stream_handler.setFormatter(formatter)
 logger.addHandler(stream_handler)
 
 
-
-
-
-# =============== Functions are below this line, SQLAlchemy classes and tables above ===============
 # all get functions are intended to check if the object already exists in the database, returning the existing object if
 # exists, a new one if it doesn't.
 
