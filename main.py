@@ -1,7 +1,8 @@
 from Goodreads_book_scraper import book_scraper
 from Goodreads_list_scraper import list_scraper
 from Class_book_record import BookRecord
-from SQL_uploader import update_db, initialise_engine_and_base
+from SQL_uploader import update_db
+from SQL_classes_tables import initialise_engine_and_base
 from config import *
 import datetime as dt
 import time
