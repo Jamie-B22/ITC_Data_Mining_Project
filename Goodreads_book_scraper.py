@@ -69,10 +69,10 @@ def date_from_text(date_text):
 
     # check which components exist and return correct date string
     if month is None:
-        return year
+        return year + '-00-00'
     elif day is None:
         month = month.group().title()
-        return datetime.strptime(' '.join([month, year]), '%B %Y').strftime('%Y-%m')
+        return datetime.strptime(' '.join([month, year]), '%B %Y').strftime('%Y-%m') + '-00'
     else:
         day = re.sub('[a-zA-Z]', '', day.group())  # remove suffix from day to leve number
         month = month.group().title()
@@ -258,7 +258,7 @@ def parse_page_html(book_id, book_page_soup):
     logger.debug(f'Dictionary for {book_id}: {book_data}')
 
     logger.debug(f'Creating book description for {book_id}')
-    book_data['Description'] = get_description(book_page_soup).encode('ascii', errors='ignore').decode('utf-8')
+    book_data['Description'] = get_description(book_page_soup)
 
     return book_data
 
@@ -303,7 +303,7 @@ def book_scraper_tests():
     assert book_data['Format'] == 'Hardcover'
     assert book_data['Series'] == 'The Kingkiller Chronicle'
     assert book_data['Number_in_series'] == '1'
-    assert book_data['Release_date'] == '2007-04'
+    assert book_data['Release_date'] == '2007-04-00'
     assert book_data['First_published_date'] == '2007-03-27'
     assert book_data['Qty_pages'] == 662
 
@@ -328,7 +328,7 @@ def book_scraper_tests():
     assert book_data['Series'] is None
     assert book_data['Number_in_series'] is None
     assert book_data['Release_date'] == '2020-11-10'
-    assert book_data['First_published_date'] == '2002'
+    assert book_data['First_published_date'] == '2002-00-00'
     assert book_data['Qty_pages'] == 467
 
     print('book_scraper() tests successful')
