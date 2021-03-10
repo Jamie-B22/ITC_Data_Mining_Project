@@ -1,7 +1,7 @@
 from Goodreads_book_scraper import book_scraper
 from Goodreads_list_scraper import list_scraper
 from Class_book_record import BookRecord
-from SQL_uploader import update_db
+from SQL_uploader import update_db, initialise_engine_and_base
 from config import *
 import datetime as dt
 import time
@@ -60,7 +60,7 @@ def args_dict():
     return type_detail
 
 
-def list_url(l_type, l_detail): # TODO: remove this as redundant now we have the argparser
+def list_url(l_type, l_detail):
     """ Creates the URL of a Goodreads list based on system arguments.
     Defaults to most read this week in local country if none entered. """
 
@@ -109,6 +109,8 @@ def main():
     start_time = time.time()
     logger.info(f"Program started at {dt.datetime.now()}")
 
+    engine = initialise_engine_and_base()
+
     command_dict = dict(args_dict())
     list_type = command_dict["list_type"]
     list_detail = command_dict["list_detail"]
@@ -123,7 +125,7 @@ def main():
         logger.info(f'Took {time_taken}s to scrape {len(book_data)} books,'
                     f' {round(time_taken/len(book_data),2)}s per book.')
         try:
-            update_db(book_data, goodreads_url, list_type, list_detail)
+            update_db(book_data, goodreads_url, list_type, list_detail, engine)
         except:
             logger.info("Writing data to CSV file")
             write_to_csv(book_data)

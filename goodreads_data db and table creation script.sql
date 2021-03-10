@@ -194,11 +194,11 @@ DROP TABLE IF EXISTS `update_description_mapping`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `update_description_mapping` (
-  `book_id` int DEFAULT NULL,
+  `book_update_id` int DEFAULT NULL,
   `description_id` int DEFAULT NULL,
-  KEY `book_id` (`book_id`),
+  KEY `book_update_id` (`book_update_id`),
   KEY `description_id` (`description_id`),
-  CONSTRAINT `update_description_mapping_ibfk_1` FOREIGN KEY (`book_id`) REFERENCES `book_updates` (`id`),
+  CONSTRAINT `update_description_mapping_ibfk_1` FOREIGN KEY (`book_update_id`) REFERENCES `book_updates` (`id`),
   CONSTRAINT `update_description_mapping_ibfk_2` FOREIGN KEY (`description_id`) REFERENCES `descriptions` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -211,11 +211,11 @@ DROP TABLE IF EXISTS `update_edition_mapping`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `update_edition_mapping` (
-  `book_id` int DEFAULT NULL,
+  `book_update_id` int DEFAULT NULL,
   `edition_id` int DEFAULT NULL,
-  KEY `book_id` (`book_id`),
+  KEY `book_update_id` (`book_update_id`),
   KEY `edition_id` (`edition_id`),
-  CONSTRAINT `update_edition_mapping_ibfk_1` FOREIGN KEY (`book_id`) REFERENCES `book_updates` (`id`),
+  CONSTRAINT `update_edition_mapping_ibfk_1` FOREIGN KEY (`book_update_id`) REFERENCES `book_updates` (`id`),
   CONSTRAINT `update_edition_mapping_ibfk_2` FOREIGN KEY (`edition_id`) REFERENCES `editions` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -228,11 +228,11 @@ DROP TABLE IF EXISTS `update_list_mapping`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `update_list_mapping` (
-  `book_id` int DEFAULT NULL,
+  `book_update_id` int DEFAULT NULL,
   `list_id` int DEFAULT NULL,
-  KEY `book_id` (`book_id`),
+  KEY `book_update_id` (`book_update_id`),
   KEY `list_id` (`list_id`),
-  CONSTRAINT `update_list_mapping_ibfk_1` FOREIGN KEY (`book_id`) REFERENCES `book_updates` (`id`),
+  CONSTRAINT `update_list_mapping_ibfk_1` FOREIGN KEY (`book_update_id`) REFERENCES `book_updates` (`id`),
   CONSTRAINT `update_list_mapping_ibfk_2` FOREIGN KEY (`list_id`) REFERENCES `lists` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;

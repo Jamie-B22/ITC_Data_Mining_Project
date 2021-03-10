@@ -14,9 +14,6 @@ import logging
 import sys
 from Class_book_record import BookRecord
 
-# TODO: change dates to date type
-# TODO: documentation and justification on why columns are in tables at the top. Explain that 'get' fns are to prevent
-#  duplicates in those tables
 
 """Setup connection to database."""
 USER = input('MySQL Username:')
@@ -24,7 +21,6 @@ USER = input('MySQL Username:')
 PASSWORD = stdiomask.getpass('MySQL Password:', mask='*')  
 SQL_LANGUAGE_CONNECTION = f'mysql://{USER}:{PASSWORD}@localhost/goodreads_data'
 Base = declarative_base()
-
 
 
 """Setup Logger"""
@@ -47,18 +43,25 @@ stream_handler.setFormatter(formatter)
 logger.addHandler(stream_handler)
 
 
-"""Check credentials are correct and database exists before scraping starts.
-    If not raise error to be passed to main.py to communicate to user."""
-try:
-    engine = create_engine(SQL_LANGUAGE_CONNECTION, echo=False)
-    Base.metadata.create_all(bind=engine)
-except exc.OperationalError as engine_err:
-    error_code = str(engine_err).split("(MySQLdb._exceptions.OperationalError) (")[1].split(",")[0]
-    logger.error(f'{engine_err}. Unable to create database engine.')
-    if error_code == "2002":
-        pass
-    if error_code in ["1045", "1049"]:
-        raise engine_err
+def initialise_engine_and_base():
+    """Check credentials are correct and database exists before scraping starts. If correct and exist, return the engine
+    if not raise error to be passed to main.py to communicate to user. If there is another error, log this and return
+    None to allow backup to csv after scraping."""
+    try:
+        engine = create_engine(SQL_LANGUAGE_CONNECTION, echo=False)
+        Base.metadata.create_all(bind=engine)
+        return engine
+    except exc.OperationalError as engine_err:
+        engine_error_code = int(engine_err.args[0].split()[1].split(',')[0][1:])
+        if engine_error_code == 1049:
+            logger.error(f'{engine_err}. Unable to create database engine due to unknown database.')
+            raise engine_err
+        elif engine_error_code == 1045:
+            logger.error(f'{engine_err}. Unable to create database engine due to incorrect credentials.')
+            raise engine_err
+        else:
+            logger.error(f'{engine_err}. Unable to create database engine, data will be stored in backup csv.')
+            return None
 
 
 edition_author_mapping = Table(
@@ -87,21 +90,21 @@ edition_genre_mapping = Table(
 update_list_mapping = Table(
     "update_list_mapping",
     Base.metadata,
-    Column("book_id", Integer, ForeignKey("book_updates.id")),
+    Column("book_update_id", Integer, ForeignKey("book_updates.id")),
     Column("list_id", Integer, ForeignKey("lists.id"))
 )
 
 update_description_mapping = Table(
     "update_description_mapping",
     Base.metadata,
-    Column("book_id", Integer, ForeignKey("book_updates.id")),
+    Column("book_update_id", Integer, ForeignKey("book_updates.id")),
     Column("description_id", Integer, ForeignKey("descriptions.id"))
 )
 
 update_edition_mapping = Table(
     "update_edition_mapping",
     Base.metadata,
-    Column("book_id", Integer, ForeignKey("book_updates.id")),
+    Column("book_update_id", Integer, ForeignKey("book_updates.id")),
     Column("edition_id", Integer, ForeignKey("editions.id"))
 )
 
@@ -352,7 +355,7 @@ def list_and_relationships_creator_and_adder(list_url, list_type, list_details, 
     return book_list
 
 
-def initialise_session():
+def initialise_session(engine):
     """Intitalise SQLAlchemy engine and session to allow uploading of records to the db. Returns the sessionmaker().
     If a connection cannot be made with the database, raise an error that will be handled in main.py to upload the book
     details to a backup csv."""
@@ -364,7 +367,6 @@ def initialise_session():
         raise session_err
 
 
-
 def create_and_commit_data(books, list_url, list_type, list_details, session):
     """Takes book and list details and calls functions that creates individual book records and a list record in the db
     and their relationships."""
@@ -374,16 +376,15 @@ def create_and_commit_data(books, list_url, list_type, list_details, session):
     logger.info(f'{len(book_updates)} books committed to database.')
 
 
-def update_db(books, list_url, list_type, list_details):
+def update_db(books, list_url, list_type, list_details, engine):
     """Take a list of book record instances (books) and the Goodreads list details in which the books were found in
     (list_url, list_type, list_details), create a database session and upload these to the database."""
     logger.info(f'Uploading {len(books)} books to database.')
-    session = initialise_session()
+    session = initialise_session(engine)
     logger.debug(f'Database connection session initialised.')
     create_and_commit_data(books, list_url, list_type, list_details, session)
     session.close()
     logger.debug(f'Database connection session closed.')
-
 
 
 if __name__ == '__main__':
@@ -395,4 +396,4 @@ if __name__ == '__main__':
     scraped_list_url = 'https://www.goodreads.com/book/most_read'
     type_arg = 'test_type'
     details_arg = 'test_details'
-    update_db(test_books, scraped_list_url, type_arg, details_arg)
+    update_db(test_books, scraped_list_url, type_arg, details_arg, initialise_engine_and_base())

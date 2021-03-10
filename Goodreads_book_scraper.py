@@ -47,6 +47,7 @@ stream_handler.setLevel(logging.INFO)
 stream_handler.setFormatter(formatter)
 logger.addHandler(stream_handler)
 
+
 def date_from_text(date_text):
     """Takes a string with the components of the date existing somewhere in the string and returns the date string in
     format YYYY-MM-DD. Date components in date_text will be in format:
