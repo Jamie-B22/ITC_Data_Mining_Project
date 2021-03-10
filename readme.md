@@ -4,9 +4,9 @@
 
 ### Description
 
-This web scraper finds, scrapes and stores details of books from Goodreads (https://www.goodreads.com/). It works by taking the user's selection of a goodreads list and scraping and storing the details of all books on that list.
+This web scraper finds, scrapes and stores details of books from [GoodReads](https://www.goodreads.com/). It works by taking the user's selection of a goodreads list and scraping and storing the details of all books on that list. The data will be stored in a MySQL database (structure detailed below), or into a CSV file if it is unable to make a connection to SQL.
 
-The web scraper was created as a project as part of the Data Science Fellows Program at ITC (https://www.itc.tech/).
+The web scraper was created as a project as part of the Data Science Fellows Program at [ITC](https://www.itc.tech/).
 
 ### Usage
 
@@ -14,7 +14,7 @@ The web scraper was created as a project as part of the Data Science Fellows Pro
 
 (Defaults to most read this week in local country if no arguments entered.)
 
-Where:
+Parameters:
 
 
 | Type | Detail | Example |
@@ -31,6 +31,12 @@ Where:
 #### Points to note:
 * To avoid throttling by goodreads, there is a 10 second wait implemented between web requests.  
 * The custom lists are made by users, you need to know which list you want to scrape and get the ID from the URL.
+
+### [Database Design](https://lh3.googleusercontent.com/D5EGkiF5it1bV2LLciYL0_Wm5eY3b7XT1TnoBIk1EFqWcHez_m5uyb7rkBzBM-v1vCR5qTFJX8wuKPrupvyfvUkY8GG2kJyg1b9tng7iKE3vFADvLFAh223U2ksS_jfPrcI0qQ8zNy0k1ntXEZBdfDmFq8ox-xKgrH6VgXHxP_IiRTlzTQy1cx2Gn2vYhbxdQtzJOCW1s699-5vPqWdSmwLSYjiZHGACA4F5R6I_7fWp7G1hvu23YzgMCCyx3AZK3a0dzLj9HMCNQ3Mx6Vmmgw7gWd3C43yhvyXXoiMI7UBCeCoMbtUmR7BLB8GOnPrIu4cU7bwChTvnDnJhIUEfH-riW1v0oAZTbewtG_vwmrb8epDt0fjsiMrnxNNuyB7NWRZubmL_B58w3RYLpNu5aDY2qZs-4vcldZPGPFA1fj628tBkj2ScxiUMnvy1vm0M2WGf6DfQGJLfJMu2VzbvUULfoWQLlqaMi7hsWts9iO4-KqburTkyhLQncMLn49ke3j_njIGQXq1Ebq-HHnhj5fsidDa4hlJb7WcJegz_A4rb7Ta_QkTT_NVkt_R7HqQZpThg9jnRdIvVqfAF-urKjzxHWG3f0FZzQeBBnCiebZIJF3BlUM9XQR6Mp7YKLsL44Mo0fgTGfHSjuYhXfzcYDXfy6-rgnelg0Tb9W8kNPfMjQRzaurWzRUkiQMoQaJBn2ULkp54tMijX-r8XzfZXXBhuKA=w1475-h796-no?authuser=0)
+
+<img src="https://lh3.googleusercontent.com/D5EGkiF5it1bV2LLciYL0_Wm5eY3b7XT1TnoBIk1EFqWcHez_m5uyb7rkBzBM-v1vCR5qTFJX8wuKPrupvyfvUkY8GG2kJyg1b9tng7iKE3vFADvLFAh223U2ksS_jfPrcI0qQ8zNy0k1ntXEZBdfDmFq8ox-xKgrH6VgXHxP_IiRTlzTQy1cx2Gn2vYhbxdQtzJOCW1s699-5vPqWdSmwLSYjiZHGACA4F5R6I_7fWp7G1hvu23YzgMCCyx3AZK3a0dzLj9HMCNQ3Mx6Vmmgw7gWd3C43yhvyXXoiMI7UBCeCoMbtUmR7BLB8GOnPrIu4cU7bwChTvnDnJhIUEfH-riW1v0oAZTbewtG_vwmrb8epDt0fjsiMrnxNNuyB7NWRZubmL_B58w3RYLpNu5aDY2qZs-4vcldZPGPFA1fj628tBkj2ScxiUMnvy1vm0M2WGf6DfQGJLfJMu2VzbvUULfoWQLlqaMi7hsWts9iO4-KqburTkyhLQncMLn49ke3j_njIGQXq1Ebq-HHnhj5fsidDa4hlJb7WcJegz_A4rb7Ta_QkTT_NVkt_R7HqQZpThg9jnRdIvVqfAF-urKjzxHWG3f0FZzQeBBnCiebZIJF3BlUM9XQR6Mp7YKLsL44Mo0fgTGfHSjuYhXfzcYDXfy6-rgnelg0Tb9W8kNPfMjQRzaurWzRUkiQMoQaJBn2ULkp54tMijX-r8XzfZXXBhuKA=w1475-h796-no?authuser=0" width="1000">
+
+Details about the database structure can be found in the file: data_dictionary
 
 ### Setup Instructions
 #### Database Setup:
