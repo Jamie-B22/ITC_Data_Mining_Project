@@ -125,15 +125,15 @@ def main():
     if len(book_data) != 0:
         logger.info(f'Took {time_taken}s to scrape {len(book_data)} books,'
                     f' {round(time_taken/len(book_data),2)}s per book.')
-        update_db(book_data, goodreads_url, list_type, list_detail, engine)
         # Next comment is to remove PyCharm warning, this broad exception is intentional.
         # noinspection PyBroadException
-        # try:
-        #     update_db(book_data, goodreads_url, list_type, list_detail, engine)
-        # except Exception:
-        #     logger.info("Writing data to CSV file")
-        #     write_to_csv(book_data)
-        #     logger.info(f"Data saved to file: {OUTPUT_FILE_NAME}")
+        try:
+            update_db(book_data, goodreads_url, list_type, list_detail, engine)
+        except Exception as err:
+            logger.info("Writing data to CSV file")
+            write_to_csv(book_data)
+            logger.info(f"Data saved to file: {OUTPUT_FILE_NAME}")
+            logger.error(f'Error encountered on upload to db: {err}')
 
 
 if __name__ == '__main__':

@@ -294,8 +294,10 @@ class Edition(Base):
     title = Column('title', String(250))
     format = Column('format', String(250))
     number_in_series = Column('number_in_series', String(250))
-    release_date = Column('release_date', Date)
-    first_published_date = Column('first_published_date', Date)
+    # earlier and some Linux versions of MySQL have issue with passing a string to a date here,
+    # so keep as string of length 10.
+    release_date = Column('release_date', String(10))
+    first_published_date = Column('first_published_date', String(10))
     qty_pages = Column('qty_rpages', Integer)
 
     book_updates = relationship('BookUpdate', secondary=update_edition_mapping)
