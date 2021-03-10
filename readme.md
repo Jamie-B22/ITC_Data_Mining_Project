@@ -55,7 +55,7 @@ have read and write access to the `goodreads_data` database you have created on 
 
 #### Requirements Install:
 #### Linux
-1. From the directory the requirements.txt file is located in, run command `pip3 install --user -r requirements.txt`
+1. From the directory the requirements.txt file is located in, run command `pip install --user -r requirements.txt`
 2. If there are issues with the installation of the `mysqlclient` library:
     - If you are on a 64 bit machine ensure that you have the latest 64 bit version of Python3.
    - Run commands `sudo apt-get install libmysqlclient-dev`, `sudo apt-get install python3-dev` and `sudo apt-get install gcc`
