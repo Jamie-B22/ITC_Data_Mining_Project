@@ -1,5 +1,5 @@
 """
-Functions and SQLAlchemy classes for defining database and enabling upload to the database.
+Functions and SQLAlchemy enabling upload to the database.
 
 Author: Jamie Bamforth
 """

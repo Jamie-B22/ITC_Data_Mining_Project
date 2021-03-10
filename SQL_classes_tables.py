@@ -1,3 +1,10 @@
+"""
+SQLAlchemy classes and tables for defining database and enabling upload to the database.
+
+Author: Jamie Bamforth
+"""
+
+
 from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, DECIMAL, Table, Date
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
@@ -5,7 +12,6 @@ from sqlalchemy import exc
 import stdiomask
 import logging
 import sys
-
 
 
 """Setup connection to database."""
@@ -56,9 +62,7 @@ def initialise_engine_and_base():
             logger.error(f'{engine_err}. Unable to create database engine, data will be stored in backup csv.')
             return None
 
-
-
-
+# Define mappings
 edition_author_mapping = Table(
     "edition_author_mapping",
     Base.metadata,
@@ -105,6 +109,21 @@ update_edition_mapping = Table(
 
 
 class BookUpdate(Base):
+    """Class inheriting from dectarative_base() instance Base that allows instances to be created to store the updates
+    to a book edition with each scrape. Instance is initiated with below parameters taken directly from a BookRecord
+    class instance. id is created sequentially as primary key.
+    Parameters:
+        id : int - primary key in database table
+        rating : decimal to 2 d.p. and 3 s.f. - range 0-5 stars
+        qty_ratings : int
+        qty_reviews : int
+        scrape_datetime : datetime
+
+    Relationships with:
+        Edition < this class
+        Description < this class
+        List < this class
+    """
     __tablename__ = 'book_updates'
     id = Column('id', Integer, primary_key=True)
     rating = Column('rating', DECIMAL(3, 2))
@@ -127,6 +146,16 @@ class BookUpdate(Base):
 
 
 class Author(Base):
+    """Class inheriting from dectarative_base() instance Base that allows instances to be created to store the unique
+    author names. Instance is initiated with below parameters taken directly from a BookRecord class instance.
+    id is created sequentially as primary key.
+    Parameters:
+        id : int - primary key in database table
+        name : str
+
+    Relationships with:
+        Edition > this class
+    """
     __tablename__ = 'authors'
     id = Column('id', Integer, primary_key=True)
     name = Column('name', String(250), unique=True)
@@ -140,6 +169,16 @@ class Author(Base):
 
 
 class Series(Base):
+    """Class inheriting from dectarative_base() instance Base that allows instances to be created to store the unique
+    series names. Instance is initiated with below parameters taken directly from a BookRecord class instance.
+    id is created sequentially as primary key.
+    Parameters:
+        id : int - primary key in database table
+        name : str
+
+    Relationships with:
+        Edition > this class
+    """
     __tablename__ = 'series'
     id = Column('id', Integer, primary_key=True)
     name = Column('name', String(250), unique=True)
@@ -153,6 +192,16 @@ class Series(Base):
 
 
 class Genre(Base):
+    """Class inheriting from dectarative_base() instance Base that allows instances to be created to store the unique
+    genre names. Instance is initiated with below parameters taken directly from a BookRecord class instance.
+    id is created sequentially as primary key.
+    Parameters:
+        id : int - primary key in database table
+        name : str
+
+    Relationships with:
+        Edition >< this class
+    """
     __tablename__ = 'genres'
     id = Column('id', Integer, primary_key=True)
     name = Column('name', String(250), unique=True)
@@ -166,6 +215,17 @@ class Genre(Base):
 
 
 class Description(Base):
+    """Class inheriting from dectarative_base() instance Base that allows instances to be created to store the unique
+    description strings. Separate to updates as each string is quite long and only changes occasionally, so can be
+    re-used between updates. Instance is initiated with below parameters taken directly from a BookRecord class instance
+    id is created sequentially as primary key.
+    Parameters:
+        id : int - primary key in database table
+        description : str
+
+    Relationships with:
+        BookUpdate > this class
+    """
     __tablename__ = 'descriptions'
     id = Column('id', Integer, primary_key=True)
     description = Column('description', String(10000))  # TODO:deal with error string is too long (truncate str[:10000])
@@ -179,6 +239,19 @@ class Description(Base):
 
 
 class List(Base):
+    """Class inheriting from dectarative_base() instance Base that allows List instances to be created to store the
+    unique list information. Instance is initiated with url, type and detail parameters determined from the user input
+    in main.py.
+    id is created sequentially as primary key.
+    Parameters:
+        id : int - primary key in database table
+        type : str
+        details : str
+        url : str
+
+    Relationships with:
+        BookUpdate > this class
+    """
     __tablename__ = 'lists'
     id = Column('id', Integer, primary_key=True)
     type = Column('type', String(250))
@@ -196,6 +269,25 @@ class List(Base):
 
 
 class Edition(Base):
+    """Class inheriting from dectarative_base() instance Base that allows instances to be created to store the unique
+    series names. Instance is initiated with below parameters taken directly from a BookRecord class instance.
+    id is created sequentially as primary key.
+    Parameters:
+        id : int - primary key in database table
+        goodreads_id : str
+        title : str
+        format : str
+        number_in_series : str
+        release_date : date
+        first_published_date : date
+        qty_pages : int
+
+    Relationships with:
+        BookUpdate > this class
+        Author < this class
+        Series < this class
+        Genre >< this class
+    """
     __tablename__ = 'editions'
     id = Column('id', Integer, primary_key=True)
     goodreads_id = Column('goodreads_id', Integer)

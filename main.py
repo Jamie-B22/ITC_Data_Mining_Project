@@ -92,7 +92,7 @@ def scrape_books_from_list(book_id_list):
     return book_data
 
 
-def write_to_csv(book_data): # TODO: remove this as redundant now we have the Db
+def write_to_csv(book_data):
     """Take a list of Book_Record objects and save each Book_record as a row in a CSV."""
     logger.debug(f'Saving scraped data in {OUTPUT_FILE_NAME}.')
     keys = book_data[0].__dict__.keys()
@@ -125,9 +125,11 @@ def main():
     if len(book_data) != 0:
         logger.info(f'Took {time_taken}s to scrape {len(book_data)} books,'
                     f' {round(time_taken/len(book_data),2)}s per book.')
+        # Next comment is to remove PyCharm warning, this broad exception is intentional.
+        # noinspection PyBroadException
         try:
             update_db(book_data, goodreads_url, list_type, list_detail, engine)
-        except:
+        except Exception:
             logger.info("Writing data to CSV file")
             write_to_csv(book_data)
             logger.info(f"Data saved to file: {OUTPUT_FILE_NAME}")
