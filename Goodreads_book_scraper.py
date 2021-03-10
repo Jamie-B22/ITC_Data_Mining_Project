@@ -43,7 +43,7 @@ file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 
 stream_handler = logging.StreamHandler(sys.stdout)
-stream_handler.setLevel(logging.WARNING)
+stream_handler.setLevel(logging.INFO)
 stream_handler.setFormatter(formatter)
 logger.addHandler(stream_handler)
 
@@ -255,7 +255,7 @@ def parse_page_html(book_id, book_page_soup):
 
     book_data['Scrape_datetime'] = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
 
-    logger.info(f'Dictionary for {book_id}: {book_data}')
+    logger.debug(f'Dictionary for {book_id}: {book_data}')
 
     logger.debug(f'Creating book description for {book_id}')
     book_data['Description'] = get_description(book_page_soup).encode('ascii', errors='ignore').decode('utf-8')
@@ -267,13 +267,13 @@ def book_scraper(book_id):
     """Takes a Goodreads book ID and an optional proxy address (format [IP address]:[port]) and returns a dictionary of
     book data scraped from the Goodreads webpage for the book ID."""
 
-    logger.debug(f'Scraping book {book_id}')
+    logger.info(f'Scraping book {book_id}')
 
     book_page = request_book_page_html(book_id)
     book_page_soup = bs4.BeautifulSoup(book_page.text, 'html.parser')
     book_data = parse_page_html(book_id, book_page_soup)
 
-    logger.info(f"Book {book_id} scraped")
+    logger.debug(f"Book {book_id} scraped")
     time.sleep(ANTI_THROTTLE_DELAY_S + random.randint(0, 1))  # to avoid throttling, 9s wasn't enough
     return book_data
 
