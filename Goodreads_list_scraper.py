@@ -9,7 +9,7 @@ import bs4
 import logging
 import sys
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('List_scraper')
 logger.setLevel(logging.DEBUG)
 
 # Create Formatter

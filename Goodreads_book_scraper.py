@@ -29,7 +29,7 @@ from config import *
 import logging
 import sys
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('Book_scraper')
 logger.setLevel(logging.DEBUG)
 
 # Create Formatter

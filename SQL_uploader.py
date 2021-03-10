@@ -14,7 +14,7 @@ from SQL_classes_tables import Author, Series, Genre, Description, Edition, List
 
 
 """Setup Logger"""
-logger = logging.getLogger('main')
+logger = logging.getLogger('SQL_uploader')
 logger.setLevel(logging.DEBUG)
 
 # Create Formatter
