@@ -32,11 +32,11 @@ Parameters:
 * To avoid throttling by goodreads, there is a 10 second wait implemented between web requests.  
 * The custom lists are made by users, you need to know which list you want to scrape and get the ID from the URL.
 
-### [Database Design](https://raw.githubusercontent.com/Jamie-B22/ITC_Data_Mining_Project/master/ERD.jpg)
+### Database Design
 
 <img src="https://raw.githubusercontent.com/Jamie-B22/ITC_Data_Mining_Project/master/ERD.jpg" width="1000">
 
-Details about the database structure can be found in the file: data_dictionary
+Details about the database structure can be found in the file: [data_dictionary](https://github.com/Jamie-B22/ITC_Data_Mining_Project/blob/master/data_dictionary.xlsx)
 
 ### Setup Instructions
 #### Database Setup:
