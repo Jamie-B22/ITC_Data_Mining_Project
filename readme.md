@@ -19,10 +19,11 @@ Parameters:
 
 | Type | Detail | Example |
 | :--- | :----------- | :-------- |
-| `most-popular` | `[YYYYMM]` | `most-popular 202001` |
+| <code>~~most-popular~~</code>* | <code>~~\[YYYYMM]~~</code>* | <code>~~most-popular 202001~~</code>* |
 | `most-read` | `COUNTRYperiod` | `most-read ILm` |
 | `new-releases` | `genre` | `new-releases fantasy` |
 | `custom-list` | `customID` | `custom-list 121572` |
+###### *Update on 16/03/2021: Goodreads has changed their page design and HTML for their 'most read' pages in the last couple of days and so the `most-popular` type option has stopped working. This will be fixed in the next few days.
 
 #### Example:
 
