@@ -12,10 +12,10 @@ import argparse
 import logging
 import sys
 
-# TODO: Remove duplicate log lines
 
 logger = logging.getLogger('main')
 logger.setLevel(logging.DEBUG)
+
 
 # Create Formatter
 formatter = logging.Formatter(

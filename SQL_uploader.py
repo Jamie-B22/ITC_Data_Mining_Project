@@ -14,23 +14,9 @@ from SQL_classes_tables import Author, Series, Genre, Description, Edition, List
 
 
 """Setup Logger"""
-logger = logging.getLogger('SQL_uploader')
+logger = logging.getLogger('main')
 logger.setLevel(logging.DEBUG)
 
-# Create Formatter
-formatter = logging.Formatter(
-    '%(asctime)s-%(levelname)s-FILE:%(filename)s-FUNC:%(funcName)s-LINE:%(lineno)d-%(message)s')
-
-# create a file handler and add it to logger
-file_handler = logging.FileHandler('main.log')
-file_handler.setLevel(logging.DEBUG)
-file_handler.setFormatter(formatter)
-logger.addHandler(file_handler)
-
-stream_handler = logging.StreamHandler(sys.stdout)
-stream_handler.setLevel(logging.INFO)
-stream_handler.setFormatter(formatter)
-logger.addHandler(stream_handler)
 
 
 # all get functions are intended to check if the object already exists in the database, returning the existing object if
