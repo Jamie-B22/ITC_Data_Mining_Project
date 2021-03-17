@@ -62,8 +62,14 @@ def list_parser(list_url):
     list. Books are either in a detailed list or as thumbnails, and the soup is parsed differently for each"""
 
     list_page_soup = list_soup(list_url)
+    if "goodreads.com/book/popular_by_date/" in list_url:
+        # with this URL
+        titles = list_page_soup.find_all("a", {"class": "BookCover"})
+        # book ID may be followed by either . or -
+        # set used as this occurs twice for each book ID and need to remove duplicates.
+        book_id_list = list({title['href'].split('/')[-1].split('.')[0].split('-')[0] for title in titles})
 
-    if "goodreads.com/book/" in list_url or "goodreads.com/list/" in list_url:  # most read and most popular list start
+    elif "goodreads.com/book/" in list_url or "goodreads.com/list/" in list_url:  # most read and most popular list start
         # with this URL
         titles = list_page_soup.find_all("a", {"class": "bookTitle"})
         # book ID may be followed by either . or -
@@ -98,8 +104,11 @@ def list_scraper_tests():
     # print(list_scraper('https://www.goodreads.com/genres/new_releases/fiction', '139.99.102.114:80'))
     # print(list_scraper('http://www.goodreads.com/book/popular_by_date/2020/11'))
     # print(list_scraper('https://www.goodreads.com/genres/new_releases/fiction'))
-    print(list_scraper('https://www.goodreads.com/list/show/158045.Thinking_with_the_Heart'))
+    # print(list_scraper('https://www.goodreads.com/list/show/158045.Thinking_with_the_Heart'))
     # print(list_scraper('https://www.goodreads.com/book/most_read?category=all&country=GB&duration=w'))
+    x = list_scraper('https://www.goodreads.com/book/popular_by_date/2020/12')
+    print(x)
+    print(len(x))
 
 
 if __name__ == '__main__':

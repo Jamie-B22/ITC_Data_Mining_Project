@@ -66,8 +66,9 @@ def list_url(l_type, l_detail):
     """ Creates the URL of a Goodreads list based on system arguments.
     Defaults to most read this week in local country if none entered. """
 
-    if l_type == "most-popular":
-        return BASE_URL + "book/popular_by_date/" + str(l_detail)[:YEAR_INDEX] + "/" + str(l_detail)[YEAR_INDEX:]
+    if l_type == "most-popular": # edit on 17/03/2021: new url format means leading zeros on month need to be removed
+        return BASE_URL + "book/popular_by_date/" + str(l_detail)[:YEAR_INDEX] + "/" \
+               + str(int(str(l_detail)[YEAR_INDEX:]))
     if l_type == "most-read":
         return BASE_URL + "book/most_read?category=all&country=" \
                + str(l_detail)[:COUNTRY_INDEX] + "&duration=" + str(l_detail)[-1]
@@ -120,7 +121,7 @@ def main():
 
     try:
         book_id_list = list_scraper(goodreads_url)
-    except ScrapeError as err:
+    except ScrapeError:
         logger.error('Application will finish executing but will not scrape any books.')
         book_id_list = []
     except Exception as err:
