@@ -8,6 +8,7 @@ import requests
 import bs4
 import logging
 import sys
+from scrape_error import ScrapeError
 
 logger = logging.getLogger('List_scraper')
 logger.setLevel(logging.DEBUG)
@@ -83,12 +84,15 @@ def list_scraper(list_url):
     logger.debug(f"Scraping list {list_url}")
 
     id_list = list_parser(list_url)
-
+    if len(id_list) == 0:
+        logger.error(f"Returned no book IDs from list {list_url}, it is likely the list page and it's HTML have been "
+                     f"updated")
+        raise ScrapeError("Failed to scrape book IDs, it is likely the list page and it's HTML have been updated.")
     return id_list
 
 
 def list_scraper_tests():
-    """Some tests to visually check the output is as expected. No asserts as there are external dependancies that may
+    """Some tests to visually check the output is as expected. No asserts as there are external dependencies that may
     change (website may update)"""
     # print(list_scraper('http://www.goodreads.com/book/popular_by_date/2020/11', '139.99.102.114:80'))
     # print(list_scraper('https://www.goodreads.com/genres/new_releases/fiction', '139.99.102.114:80'))

@@ -3,6 +3,7 @@ from Goodreads_list_scraper import list_scraper
 from Class_book_record import BookRecord
 from SQL_uploader import update_db
 from SQL_classes_tables import initialise_engine_and_base
+from scrape_error import ScrapeError
 from config import *
 import datetime as dt
 import time
@@ -117,7 +118,15 @@ def main():
     list_detail = command_dict["list_detail"]
     goodreads_url = list_url(list_type, list_detail)
 
-    book_id_list = list_scraper(goodreads_url)
+    try:
+        book_id_list = list_scraper(goodreads_url)
+    except ScrapeError as err:
+        logger.error('Application will finish executing but will not scrape any books.')
+        book_id_list = []
+    except Exception as err:
+        logger.error(err)
+        logger.error('Application will finish executing but will not scrape any books.')
+        book_id_list = []
 
     book_data = scrape_books_from_list(book_id_list)
 
