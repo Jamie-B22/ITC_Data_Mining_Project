@@ -193,6 +193,17 @@ def get_genre(book_page_soup):
     return genres
 
 
+def get_isbn(book_page_soup): # TODO: if missing can get from <script> in html
+    """Takes the HTML Beautiful Soup object of a Goodreads book page and returns the isbn as a string."""
+    elem = book_page_soup.find('meta', {'property': 'books:isbn'})
+    if elem is None:
+        return None
+    elif elem['content'] == 'null':
+        return None
+    else:
+        return elem['content']
+
+
 # =============== Above this line are all functions to extract the data from the Beautiful Soup object ===============
 
 def request_book_page_html(book_id):
@@ -239,6 +250,7 @@ def parse_page_html(book_id, book_page_soup):
     book_data['Qty_reviews'] = get_num_reviews(book_page_soup)
     book_data['Qty_pages'] = get_num_pages(book_page_soup)
     book_data['Genres'] = get_genre(book_page_soup)
+    book_data['ISBN'] = get_isbn(book_page_soup)
 
     book_data['Scrape_datetime'] = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
 
@@ -269,7 +281,7 @@ def book_scraper_tests():
     """Tests scraper against data that should not change, eg. title, author, number of pages.
     Some data such as qty reviews will change live and so is not tested."""
     # test book ID 50877284
-    print(book_scraper('50877284'))
+    # print(book_scraper('50877284'))
     # test book ID 38599259
     book_data = book_scraper('38599259')
     assert book_data['Book_ID'] == '38599259'
@@ -281,6 +293,7 @@ def book_scraper_tests():
     assert book_data['Release_date'] == '2020-01-14'
     assert book_data['First_published_date'] is None
     assert book_data['Qty_pages'] == 304
+    assert book_data['ISBN'] is None
 
     # test book ID 186074
     book_data = book_scraper('186074')
@@ -293,6 +306,7 @@ def book_scraper_tests():
     assert book_data['Release_date'] == '2007-04-00'
     assert book_data['First_published_date'] == '2007-03-27'
     assert book_data['Qty_pages'] == 662
+    assert book_data['ISBN'] == '9780756404079'
 
     # test book ID 1
     book_data = book_scraper('1')
@@ -305,6 +319,7 @@ def book_scraper_tests():
     assert book_data['Release_date'] == '2006-09-16'
     assert book_data['First_published_date'] == '2005-07-16'
     assert book_data['Qty_pages'] == 652
+    assert book_data['ISBN'] is None
 
     # test book ID 48764258
     book_data = book_scraper('48764258')
@@ -317,9 +332,12 @@ def book_scraper_tests():
     assert book_data['Release_date'] == '2020-11-10'
     assert book_data['First_published_date'] == '2002-00-00'
     assert book_data['Qty_pages'] == 467
+    assert book_data['ISBN'] == '9781250214430'
 
     print('book_scraper() tests successful')
 
 
 if __name__ == '__main__':
     book_scraper_tests()
+
+
