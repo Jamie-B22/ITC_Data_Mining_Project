@@ -1,6 +1,8 @@
 """
 Class for storing NYTimes bestsellers books data from NYT API.
 
+NYT Books API user guide: https://developer.nytimes.com/docs/books-product/1/overview
+
 Author: Jamie Bamforth
 """
 
