@@ -234,6 +234,10 @@ def NYT_API_update_db(book_list, engine):
     logger.debug(f'Database connection session closed.')
 
 
+def OL_API_update_db(OL_book, engine):
+    print(OL_book)
+
+
 if __name__ == '__main__':
     # for initial testing only, will only run properly on a computer with the test csv.
     with open('20210121_book_data_b.csv', 'r', newline='') as file:

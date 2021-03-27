@@ -41,6 +41,32 @@ def all_search(search):
     ol_dict = json.loads(response.text)
     return open_library_docs_info(ol_dict)
 
+class OpenLibraryBookInstance:
+    """
+    Class for storing OpenLibrary book data to a table
+        OL_key : str - Unique key for each book in OpenLibrary
+        Title : str
+        Author : str
+        Edition_count : int
+        Publish_years : list of strings (which are all integers)
+        ISBN : list of strings (which are all integers)
+        Languages : list of strings
+        ID_goodreads : list of strings
+
+    Author: Jordan Ribbans
+    """
+    def __init__(self, data_dict):
+        """Instantiate a Book_Record object by passing it a dict of the data required to set it's attribute values"""
+        self.Openlibrary_id = data_dict.get('key')
+        self.Title = data_dict.get('title')
+        self.Author = data_dict.get('author_name')
+        self.Edition_count = data_dict.get('edition_count')
+        self.Publish_years = data_dict.get('publish_year')
+        self.ISBN = data_dict.get('isbn')
+        self.Languages = data_dict.get('language')
+        self.ID_goodreads = data_dict.get('id_goodreads')
+
+
 
 def main():
     # http://openlibrary.org/search.json?author=j%20k%20rowling

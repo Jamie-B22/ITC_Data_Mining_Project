@@ -43,30 +43,30 @@ openlibrary_goodreads_mapping = Table(
 )
 
 
-class OpenLibraryBookInstance:
-    """
-    Class for storing OpenLibrary book data to a table
-        OL_key : str - Unique key for each book in OpenLibrary
-        Title : str
-        Author : str
-        Edition_count : int
-        Publish_years : list of strings (which are all integers)
-        ISBN : list of strings (which are all integers)
-        Languages : list of strings
-        ID_goodreads : list of strings
-
-    Author: Jordan Ribbans
-    """
-    def __init__(self, data_dict):
-        """Instantiate a Book_Record object by passing it a dict of the data required to set it's attribute values"""
-        self.Openlibrary_id = data_dict.get('key')
-        self.Title = data_dict.get('title')
-        self.Author = data_dict.get('author_name')
-        self.Edition_count = data_dict.get('edition_count')
-        self.Publish_years = data_dict.get('publish_year')
-        self.ISBN = data_dict.get('isbn')
-        self.Languages = data_dict.get('language')
-        self.ID_goodreads = data_dict.get('id_goodreads')
+# class OpenLibraryBookInstance:
+#     """
+#     Class for storing OpenLibrary book data to a table
+#         OL_key : str - Unique key for each book in OpenLibrary
+#         Title : str
+#         Author : str
+#         Edition_count : int
+#         Publish_years : list of strings (which are all integers)
+#         ISBN : list of strings (which are all integers)
+#         Languages : list of strings
+#         ID_goodreads : list of strings
+#
+#     Author: Jordan Ribbans
+#     """
+#     def __init__(self, data_dict):
+#         """Instantiate a Book_Record object by passing it a dict of the data required to set it's attribute values"""
+#         self.Openlibrary_id = data_dict.get('key')
+#         self.Title = data_dict.get('title')
+#         self.Author = data_dict.get('author_name')
+#         self.Edition_count = data_dict.get('edition_count')
+#         self.Publish_years = data_dict.get('publish_year')
+#         self.ISBN = data_dict.get('isbn')
+#         self.Languages = data_dict.get('language')
+#         self.ID_goodreads = data_dict.get('id_goodreads')
 
 
 class OpenLibraryBook(Base):
@@ -109,7 +109,7 @@ class OpenLibraryBook(Base):
         return str(self.__dict__.values())
 
 
-class Publish_year(Base):
+class PublishYear(Base):
     """Class inheriting from declarative_base() instance Base that allows instances to be created to store the unique
     publish years. Instance is initiated with below parameters taken directly from a OpenLibraryBookInstance class instance.
     id is created sequentially as primary key.
@@ -169,7 +169,7 @@ class ISBN(Base):
         self.isbn = isbn
 
 
-class GoodReads_IDs(Base):
+class GoodreadsID(Base):
     """Class inheriting from declarative_base() instance Base that allows instances to be created to store the unique
     GoodRead IDs. Instance is initiated with below parameters taken directly from a OpenLibraryBookInstance class instance.
     id is created sequentially as primary key.

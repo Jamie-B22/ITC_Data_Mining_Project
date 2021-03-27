@@ -107,6 +107,13 @@ nyt_bestseller_isbn_list_mapping = Table(
     Column("nyt_bestseller_isbn", String(13), ForeignKey("nyt_bestseller_isbns.isbn"))
 )
 
+edition_goodreads_ids_mapping = Table(
+    "edition_goodreads_ids_mapping",
+    Base.metadata,
+    Column("goodreadsid_id", Integer, ForeignKey("openlibrary_goodreads.id")),
+    Column("edition_id", Integer, ForeignKey("editions.id"))
+)
+
 
 class BookUpdate(Base):
     """Class inheriting from dectarative_base() instance Base that allows instances to be created to store the updates
@@ -309,6 +316,7 @@ class Edition(Base):
     series = relationship('Series', secondary=edition_series_mapping)
     genres = relationship('Genre', secondary=edition_genre_mapping)
     nyt_bestsellers_isbns = relationship('NYTBestsellerISBN', secondary=edition_nyt_bestseller_mapping)
+    ol_goodreads_ids = relationship('GoodreadsID', secondary=edition_goodreads_ids_mapping)
 
 
     def __init__(self, book_record_instance):
@@ -356,6 +364,168 @@ class NYTBestsellerList(Base):
         return str(self.__dict__.values())
 
 
+# ############ Open Library API #################
+
+openlibrary_publish_years_mapping = Table(
+    "openlibrary_publish_years_mapping",
+    Base.metadata,
+    Column("open_library_book_id", Integer, ForeignKey("openlibrary_book.id")),
+    Column("publish_year_id", Integer, ForeignKey("openlibrary_publish_years.id"))
+)
+
+
+openlibrary_isbn_mapping = Table(
+    "openlibrary_isbn_mapping",
+    Base.metadata,
+    Column("open_library_book_id", Integer, ForeignKey("openlibrary_book.id")),
+    Column("isbn_id", Integer, ForeignKey("openlibrary_isbn.id"))
+)
+
+
+openlibrary_languages_mapping = Table(
+    "openlibrary_languages_mapping",
+    Base.metadata,
+    Column("open_library_book_id", Integer, ForeignKey("openlibrary_book.id")),
+    Column("language_id", Integer, ForeignKey("openlibrary_languages.id"))
+)
+
+openlibrary_goodreads_mapping = Table(
+    "openlibrary_goodreads_mapping",
+    Base.metadata,
+    Column("open_library_book_id", Integer, ForeignKey("openlibrary_book.id")),
+    Column("goodreads_id", Integer, ForeignKey("openlibrary_goodreads.id"))
+)
+
+
+
+
+
+
+
+class OpenLibraryBook(Base):
+    """Class inheriting from dectarative_base() instance Base that allows instances to be created to store the unique
+    series names. Instance is initiated with below parameters taken directly from a BookRecord class instance.
+    id is created sequentially as primary key.
+    Parameters:
+        id : int - primary key in database table
+        openlibrary_id : str
+        title : str
+        author : str
+        edition_count : str
+
+    Relationships with:
+        Publish_years > this class
+        ISBN > this class
+        Language > this class
+        Goodreads_ID > this class
+    """
+    __tablename__ = 'openlibrary_book'
+    id = Column('id', Integer, primary_key=True)
+    openlibrary_id = Column('openlibrary_id', String(50))
+    title = Column('title', String(250))
+    author = Column('author', String(50))
+    edition_count = Column('edition_count', Integer)
+
+    publish_years = relationship('PublishYear', secondary=openlibrary_publish_years_mapping)
+    isbn = relationship('OLISBN', secondary=openlibrary_isbn_mapping)
+    language = relationship('Language', secondary=openlibrary_languages_mapping)
+    goodreads_id = relationship('GoodreadsID', secondary=openlibrary_goodreads_mapping)
+
+    def __init__(self, book_record_instance):
+        self.openlibrary_id = book_record_instance.Openlibrary_id
+        self.title = book_record_instance.Title
+        self.author = book_record_instance.Author
+        self.edition_count = book_record_instance.Edition_count
+
+
+    def __str__(self):
+        return str(self.__dict__.values())
+
+
+
+class PublishYear(Base):
+    """Class inheriting from declarative_base() instance Base that allows instances to be created to store the unique
+    publish years. Instance is initiated with below parameters taken directly from a OpenLibraryBookInstance class instance.
+    id is created sequentially as primary key.
+    Parameters:
+        id : int - primary key in database table
+        year : int
+
+    Relationships with:
+        openlibrary_book >< this class
+    """
+    __tablename__ = 'openlibrary_publish_years'
+    id = Column('id', Integer, primary_key=True)
+    year = Column('year', Integer)
+
+    OLbooks = relationship('OpenLibraryBook', secondary=openlibrary_publish_years_mapping)
+
+    def __init__(self, year):
+        self.year = int(year)
+
+
+class OLISBN(Base):
+    """Class inheriting from declarative_base() instance Base that allows instances to be created to store the unique
+    ISBNs. Instance is initiated with below parameters taken directly from a OpenLibraryBookInstance class instance.
+    id is created sequentially as primary key.
+    Parameters:
+        id : int - primary key in database table
+        isbn : str
+
+    Relationships with:
+        openlibrary_book >< this class
+    """
+    __tablename__ = 'openlibrary_isbn'
+    id = Column('id', Integer, primary_key=True)
+    isbn = Column('isbn', Integer, unique=True)
+
+    OLbook = relationship('OpenLibraryBook', secondary=openlibrary_isbn_mapping)
+
+    def __init__(self, isbn):
+        self.isbn = isbn
+
+
+class Language(Base):
+    """Class inheriting from declarative_base() instance Base that allows instances to be created to store the unique
+    languages. Instance is initiated with below parameters taken directly from a OpenLibraryBookInstance class instance.
+    id is created sequentially as primary key.
+    Parameters:
+        id : int - primary key in database table
+        language : str
+
+    Relationships with:
+        openlibrary_book >< this class
+    """
+    __tablename__ = 'openlibrary_languages'
+    id = Column('id', Integer, primary_key=True)
+    language = Column('language', String(10), unique=True)
+
+    book_id = relationship('OpenLibraryBook', secondary=openlibrary_languages_mapping)
+
+    def __init__(self, language):
+        self.language = language
+
+
+class GoodreadsID(Base):
+    """Class inheriting from declarative_base() instance Base that allows instances to be created to store the unique
+    GoodRead IDs. Instance is initiated with below parameters taken directly from a OpenLibraryBookInstance class instance.
+    id is created sequentially as primary key.
+    Parameters:
+        id : int - primary key in database table
+        year : int
+
+    Relationships with:
+        openlibrary_book >< this class
+    """
+    __tablename__ = 'openlibrary_goodreads'
+    id = Column('id', Integer, primary_key=True)
+    goodreads_id = Column('goodreads_id', Integer, unique=True)
+
+    OLbook = relationship('OpenLibraryBook', secondary=openlibrary_goodreads_mapping)
+    edition = relationship('OpenLibraryBook', secondary=edition_goodreads_ids_mapping)
+
+    def __init__(self, goodreads_id):
+        self.goodreads_id = goodreads_id
 
 
 def create_tables():
