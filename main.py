@@ -120,7 +120,7 @@ def main():
     goodreads_url = list_url(list_type, list_detail)
 
     try:
-        book_id_list = list_scraper(goodreads_url)
+        book_id_list = list_scraper(goodreads_url)[:1]
     except ScrapeError:
         logger.error('Application will finish executing but will not scrape any books.')
         book_id_list = []

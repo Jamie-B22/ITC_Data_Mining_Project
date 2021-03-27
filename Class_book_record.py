@@ -29,6 +29,7 @@ class BookRecord:
     def __init__(self, data_dict):
         """Instantiate a Book_Record object by passing it a dict of the data required to set it's attribute values"""
         self.Book_ID = data_dict['Book_ID']
+        self.ISBN = data_dict['ISBN']
         self.Title = data_dict['Title']
         self.Author = data_dict['Author']
         self.Format = data_dict['Format']

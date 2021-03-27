@@ -92,6 +92,21 @@ update_edition_mapping = Table(
     Column("edition_id", Integer, ForeignKey("editions.id"))
 )
 
+edition_nyt_bestseller_mapping = Table(
+    "edition_nyt_bestseller_mapping",
+    Base.metadata,
+    Column("edition_id", Integer, ForeignKey("editions.id")),
+    Column("nyt_bestseller_isbn", String(13), ForeignKey("nyt_bestseller_isbns.isbn"))
+)
+
+
+nyt_bestseller_isbn_list_mapping = Table(
+    "nyt_bestseller_isbn_list_mapping",
+    Base.metadata,
+    Column("nyt_bestseller_lists_id", Integer, ForeignKey("nyt_bestseller_lists.id")),
+    Column("nyt_bestseller_isbn", String(13), ForeignKey("nyt_bestseller_isbns.isbn"))
+)
+
 
 class BookUpdate(Base):
     """Class inheriting from dectarative_base() instance Base that allows instances to be created to store the updates
@@ -276,6 +291,7 @@ class Edition(Base):
     __tablename__ = 'editions'
     id = Column('id', Integer, primary_key=True)
     goodreads_id = Column('goodreads_id', Integer)
+    isbn = Column('isbn', String(13))
     title = Column('title', String(250))
     format = Column('format', String(250))
     number_in_series = Column('number_in_series', String(250))
@@ -292,9 +308,12 @@ class Edition(Base):
     # secondary=book_author_mapping is the mapping table
     series = relationship('Series', secondary=edition_series_mapping)
     genres = relationship('Genre', secondary=edition_genre_mapping)
+    nyt_bestsellers_isbns = relationship('nyt_bestseller_isbns', secondary=edition_nyt_bestseller_mapping)
+
 
     def __init__(self, book_record_instance):
         self.goodreads_id = book_record_instance.Book_ID
+        self.isbn = book_record_instance.ISBN
         self.title = book_record_instance.Title  # .encode('UTF-16', errors='replace')
         self.format = book_record_instance.Format
         self.number_in_series = book_record_instance.Number_in_series
@@ -305,6 +324,39 @@ class Edition(Base):
     def __str__(self):
         return str(self.__dict__.values())
 
+class NYTBestsellerISBN(Base):
+
+    __tablename__ = 'nyt_bestseller_isbns'
+    isbn = Column('isbn', String(13), primary_key=True)
+
+    editions = relationship('editions', secondary=edition_nyt_bestseller_mapping)
+    nyt_bestseller_lists = relationship('nyt_bestseller_lists', secondary=nyt_bestseller_isbn_list_mapping)
+
+    def __init__(self, isbn):
+        self.isbn = isbn
+
+    def __str__(self):
+        return str(self.__dict__.values())
+
+
+class NYTBestsellerList(Base):
+
+    __tablename__ = 'nyt_bestseller_lists'
+    id = Column('id', Integer, primary_key=True)
+    list_name_encoded = Column('list_name_encoded', String(250))
+    date = Column('date', String(10))
+
+    nyt_bestseller_isbns = relationship('nyt_bestseller_isbns', secondary=nyt_bestseller_isbn_list_mapping)
+
+    def __init__(self, NYTimesBookList):
+        self.list_name_encoded = NYTimesBookList.list_name_encoded
+        self.date = NYTimesBookList.date
+
+    def __str__(self):
+        return str(self.__dict__.values())
+
+
+
 
 def create_tables():
     """If database is empty or incomplete, ensures all tables are created according to the definitions in the classes
@@ -314,3 +366,6 @@ def create_tables():
     session_maker = sessionmaker(bind=engine)
     session = session_maker()
     session.close()
+
+if __name__ == '__main__':
+    create_tables()
