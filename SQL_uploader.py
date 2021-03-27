@@ -254,7 +254,7 @@ def get_publishyear(year, session):
 
 
 def get_publishyear_collection(years, session):
-    return [get_publishyear(year, session) for year in years]
+    return [get_publishyear(year, session) for year in set(years)]
 
 
 def get_olisbn(isbn, session):
@@ -267,7 +267,7 @@ def get_olisbn(isbn, session):
 
 
 def get_olisbn_collection(isbns, session):
-    return [get_olisbn(isbn, session) for isbn in isbns]
+    return [get_olisbn(isbn, session) for isbn in set(isbns)]
 
 
 def get_language(language, session):
@@ -280,7 +280,7 @@ def get_language(language, session):
 
 
 def get_language_collection(languages, session):
-    return [get_language(language, session) for language in languages]
+    return [get_language(language, session) for language in set(languages)]
 
 
 def get_goodreads_id(goodreads_id, session):
@@ -293,7 +293,7 @@ def get_goodreads_id(goodreads_id, session):
 
 
 def get_goodreads_id_collection(goodreads_ids, session):
-    return [get_goodreads_id(goodreads_id, session) for goodreads_id in goodreads_ids]
+    return [get_goodreads_id(goodreads_id, session) for goodreads_id in set(goodreads_ids)]
 
 
 def book_and_relationships_creator_and_adder(OL_book, session):
