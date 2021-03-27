@@ -5,13 +5,12 @@ Author: Jamie Bamforth
 """
 
 
-from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, DECIMAL, Table, Date
+from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, DECIMAL, Table
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy import exc
 import stdiomask
 import logging
-import sys
 
 
 """Setup connection to database."""
@@ -305,3 +304,13 @@ class Edition(Base):
 
     def __str__(self):
         return str(self.__dict__.values())
+
+
+def create_tables():
+    """If database is empty or incomplete, ensures all tables are created according to the definitions in the classes
+    and tables in this file (SWL_classes_tables.py)"""
+    engine = create_engine(SQL_LANGUAGE_CONNECTION, echo=True)
+    Base.metadata.create_all(bind=engine)
+    session_maker = sessionmaker(bind=engine)
+    session = session_maker()
+    session.close()

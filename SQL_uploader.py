@@ -8,7 +8,6 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import exc
 import csv
 import logging
-import sys
 from Class_book_record import BookRecord
 from SQL_classes_tables import Author, Series, Genre, Description, Edition, List, BookUpdate, initialise_engine_and_base
 
