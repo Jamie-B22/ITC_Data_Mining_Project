@@ -9,9 +9,9 @@ from sqlalchemy import exc
 import csv
 import logging
 from Class_book_record import BookRecord
-from APIs.Class_NYTimes_List import NYTimesBookList
 from SQL_classes_tables import Author, Series, Genre, Description, Edition, List, BookUpdate,\
-    initialise_engine_and_base, NYTBestsellerList, NYTBestsellerISBN
+    initialise_engine_and_base, NYTBestsellerList, NYTBestsellerISBN, OpenLibraryBook, PublishYear,\
+    OLISBN, Language, GoodreadsID
 
 
 """Setup Logger"""
@@ -234,8 +234,98 @@ def NYT_API_update_db(book_list, engine):
     logger.debug(f'Database connection session closed.')
 
 
+# ############# Open Library Books ###############
+
+def get_OpenLibraryBook(OL_book, session):
+    qry = session.query(OpenLibraryBook).filter(OpenLibraryBook.openlibrary_id == OL_book.Openlibrary_id).all()
+    if len(qry) == 0:
+        book = OpenLibraryBook(OL_book)
+    else:
+        book = qry[0]
+    return book
+
+def get_publishyear(year, session):
+    qry = session.query(PublishYear).filter(PublishYear.year == year).all()
+    if len(qry) == 0:
+        year = PublishYear(year)
+    else:
+        year = qry[0]
+    return year
+
+
+def get_publishyear_collection(years, session):
+    return [get_publishyear(year, session) for year in years]
+
+
+def get_olisbn(isbn, session):
+    qry = session.query(OLISBN).filter(OLISBN.isbn == isbn).all()
+    if len(qry) == 0:
+        isbn = OLISBN(isbn)
+    else:
+        isbn = qry[0]
+    return isbn
+
+
+def get_olisbn_collection(isbns, session):
+    return [get_olisbn(isbn, session) for isbn in isbns]
+
+
+def get_language(language, session):
+    qry = session.query(Language).filter(Language.language == language).all()
+    if len(qry) == 0:
+        lang = Language(language)
+    else:
+        lang = qry[0]
+    return lang
+
+
+def get_language_collection(languages, session):
+    return [get_language(language, session) for language in languages]
+
+
+def get_goodreads_id(goodreads_id, session):
+    qry = session.query(GoodreadsID).filter(GoodreadsID.goodreads_id == goodreads_id).all()
+    if len(qry) == 0:
+        id = GoodreadsID(goodreads_id)
+    else:
+        id = qry[0]
+    return id
+
+
+def get_goodreads_id_collection(goodreads_ids, session):
+    return [get_goodreads_id(goodreads_id, session) for goodreads_id in goodreads_ids]
+
+
+def book_and_relationships_creator_and_adder(OL_book, session):
+    book = get_OpenLibraryBook(OL_book, session)
+    publishyear_collection = get_publishyear_collection(OL_book.Publish_years, session)
+    book.publish_years += publishyear_collection
+    isbn_collection = get_olisbn_collection(OL_book.ISBN, session)
+    book.isbns += isbn_collection
+    language_collection = get_language_collection(OL_book.Languages, session)
+    book.languages += language_collection
+    goodreads_id_collection = get_goodreads_id_collection(OL_book.ID_goodreads, session)
+    book.goodreads_ids += goodreads_id_collection
+    # TODO: link to goodreads
+
+
+    session.add(book)
+
+
+
+def OL_book_create_and_commit_data(OL_book, session):
+    book_and_relationships_creator_and_adder(OL_book, session)
+    session.commit()
+    logger.info(f'Open Library book ISBN {OL_book.ISBN} committed to database.')
+
+
+
 def OL_API_update_db(OL_book, engine):
-    print(OL_book)
+    logger.info(f'Attempting to upload Open Library book ISBN {OL_book.ISBN} to database.')
+    session = initialise_session(engine)
+    OL_book_create_and_commit_data(OL_book, session)
+    session.close()
+    logger.debug(f'Database connection session closed.')
 
 
 if __name__ == '__main__':

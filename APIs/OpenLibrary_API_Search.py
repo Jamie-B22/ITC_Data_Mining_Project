@@ -62,7 +62,7 @@ class OpenLibraryBookInstance:
         self.Author = data_dict.get('author_name')
         self.Edition_count = data_dict.get('edition_count')
         self.Publish_years = data_dict.get('publish_year')
-        self.ISBN = data_dict.get('isbn')
+        self.ISBN = [isbn.replace('-','') for isbn in data_dict.get('isbn')]
         self.Languages = data_dict.get('language')
         self.ID_goodreads = data_dict.get('id_goodreads')
 

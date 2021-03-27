@@ -427,9 +427,9 @@ class OpenLibraryBook(Base):
     edition_count = Column('edition_count', Integer)
 
     publish_years = relationship('PublishYear', secondary=openlibrary_publish_years_mapping)
-    isbn = relationship('OLISBN', secondary=openlibrary_isbn_mapping)
-    language = relationship('Language', secondary=openlibrary_languages_mapping)
-    goodreads_id = relationship('GoodreadsID', secondary=openlibrary_goodreads_mapping)
+    isbns = relationship('OLISBN', secondary=openlibrary_isbn_mapping)
+    languages = relationship('Language', secondary=openlibrary_languages_mapping)
+    goodreads_ids = relationship('GoodreadsID', secondary=openlibrary_goodreads_mapping)
 
     def __init__(self, book_record_instance):
         self.openlibrary_id = book_record_instance.Openlibrary_id
@@ -477,7 +477,7 @@ class OLISBN(Base):
     """
     __tablename__ = 'openlibrary_isbn'
     id = Column('id', Integer, primary_key=True)
-    isbn = Column('isbn', Integer, unique=True)
+    isbn = Column('isbn', String(13))
 
     OLbook = relationship('OpenLibraryBook', secondary=openlibrary_isbn_mapping)
 
@@ -498,7 +498,7 @@ class Language(Base):
     """
     __tablename__ = 'openlibrary_languages'
     id = Column('id', Integer, primary_key=True)
-    language = Column('language', String(10), unique=True)
+    language = Column('language', String(10))
 
     book_id = relationship('OpenLibraryBook', secondary=openlibrary_languages_mapping)
 
@@ -519,10 +519,10 @@ class GoodreadsID(Base):
     """
     __tablename__ = 'openlibrary_goodreads'
     id = Column('id', Integer, primary_key=True)
-    goodreads_id = Column('goodreads_id', Integer, unique=True)
+    goodreads_id = Column('goodreads_id', String(250))
 
     OLbook = relationship('OpenLibraryBook', secondary=openlibrary_goodreads_mapping)
-    edition = relationship('OpenLibraryBook', secondary=edition_goodreads_ids_mapping)
+    edition = relationship('Edition', secondary=edition_goodreads_ids_mapping)
 
     def __init__(self, goodreads_id):
         self.goodreads_id = goodreads_id
