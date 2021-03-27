@@ -8,9 +8,10 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import exc
 import csv
 import logging
-import sys
 from Class_book_record import BookRecord
-from SQL_classes_tables import Author, Series, Genre, Description, Edition, List, BookUpdate, initialise_engine_and_base
+from APIs.Class_NYTimes_List import NYTimesBookList
+from SQL_classes_tables import Author, Series, Genre, Description, Edition, List, BookUpdate,\
+    initialise_engine_and_base, NYTBestsellerList, NYTBestsellerISBN
 
 
 """Setup Logger"""
@@ -95,6 +96,38 @@ def get_book_list(list_url, list_type, list_details, session):
     return book_list
 
 
+def get_isbn13(isbn13, session):
+    """Checks if the isbn associated with isbn13 exists in the db already. If exists, returns that NYTBestsellerISBN
+     object, if not creates and returns a new one."""
+    qry = session.query(NYTBestsellerISBN).filter(NYTBestsellerISBN.isbn == isbn13).all()
+    if len(qry) == 0:
+        isbn = NYTBestsellerISBN(isbn13)
+    else:
+        isbn = qry[0]
+    return isbn
+
+def get_edition_from_isbn(isbn, session):
+    """Checks if the edition associated with the isbn exists in the db already. If exists, returns that Edition
+     object, if not returns None"""
+    qry = session.query(Edition).filter(Edition.isbn == isbn).all()
+    if len(qry) == 0:
+        return None
+    else:
+        return qry[0]
+
+
+def get_NYT_list(book_list, session):
+    """Checks if the list associated with isbn13 exists in the db already. If exists, returns that NYTBestsellerList
+     object, if not creates and returns a new one."""
+    qry = session.query(NYTBestsellerList).filter(NYTBestsellerList.list_name_encoded == book_list.list_name_encoded,
+                                                  NYTBestsellerList.date == book_list.date).all()
+    if len(qry) == 0:
+        list = NYTBestsellerList(book_list)
+    else:
+        list = qry[0]
+    return list
+
+
 def ensure_set(obj):
     """Takes an object and returns that object as a set if the ibject is a set or the JSON string encoding of a set,
     else returns None. The use case for this is when extracting sets that have been uploaded to csv and converting them
@@ -140,6 +173,18 @@ def list_and_relationships_creator_and_adder(list_url, list_type, list_details, 
     session.add(book_list)
     return book_list
 
+def isbn_relationships_creater_and_adder(isbn, session):
+    isbn_instance = get_isbn13(isbn, session)
+    edition = get_edition_from_isbn(isbn, session)
+    if edition is not None:
+        isbn_instance.editions += [edition]
+    session.add(isbn_instance)
+    return isbn_instance
+
+def NYT_list_relationships_creater_and_adder(isbn_instances, book_list, session):
+    NYT_list = get_NYT_list(book_list, session)
+    NYT_list.nyt_bestseller_isbns += isbn_instances
+    session.add(NYT_list)
 
 def initialise_session(engine):
     """Intitalise SQLAlchemy engine and session to allow uploading of records to the db. Returns the sessionmaker().
@@ -169,6 +214,22 @@ def update_db(books, list_url, list_type, list_details, engine):
     logger.info(f'Attempting to upload {len(books)} books to database.')
     session = initialise_session(engine)
     create_and_commit_data(books, list_url, list_type, list_details, session)
+    session.close()
+    logger.debug(f'Database connection session closed.')
+
+
+def NYT_list_create_and_commit_data(book_list, session):
+    isbn_instances = [isbn_relationships_creater_and_adder(isbn, session) for isbn in book_list.get_isbn13s()]
+    NYT_list_relationships_creater_and_adder(isbn_instances, book_list, session)
+    session.commit()
+    logger.info(f'{len(book_list.get_isbn13s())} isbns and corresponding list committed to database.')
+
+
+def NYT_API_update_db(book_list, engine):
+    print(book_list.get_isbn10s())
+    logger.info(f'Attempting to upload {len(book_list.get_isbn13s())} NYT bestseller isbns to database.')
+    session = initialise_session(engine)
+    NYT_list_create_and_commit_data(book_list, session)
     session.close()
     logger.debug(f'Database connection session closed.')
 
