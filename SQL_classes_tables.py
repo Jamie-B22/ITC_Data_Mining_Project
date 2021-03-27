@@ -308,7 +308,7 @@ class Edition(Base):
     # secondary=book_author_mapping is the mapping table
     series = relationship('Series', secondary=edition_series_mapping)
     genres = relationship('Genre', secondary=edition_genre_mapping)
-    nyt_bestsellers_isbns = relationship('nyt_bestseller_isbns', secondary=edition_nyt_bestseller_mapping)
+    nyt_bestsellers_isbns = relationship('NYTBestsellerISBN', secondary=edition_nyt_bestseller_mapping)
 
 
     def __init__(self, book_record_instance):
@@ -329,8 +329,8 @@ class NYTBestsellerISBN(Base):
     __tablename__ = 'nyt_bestseller_isbns'
     isbn = Column('isbn', String(13), primary_key=True)
 
-    editions = relationship('editions', secondary=edition_nyt_bestseller_mapping)
-    nyt_bestseller_lists = relationship('nyt_bestseller_lists', secondary=nyt_bestseller_isbn_list_mapping)
+    editions = relationship('Edition', secondary=edition_nyt_bestseller_mapping)
+    nyt_bestseller_lists = relationship('NYTBestsellerList', secondary=nyt_bestseller_isbn_list_mapping)
 
     def __init__(self, isbn):
         self.isbn = isbn
@@ -346,7 +346,7 @@ class NYTBestsellerList(Base):
     list_name_encoded = Column('list_name_encoded', String(250))
     date = Column('date', String(10))
 
-    nyt_bestseller_isbns = relationship('nyt_bestseller_isbns', secondary=nyt_bestseller_isbn_list_mapping)
+    nyt_bestseller_isbns = relationship('NYTBestsellerISBN', secondary=nyt_bestseller_isbn_list_mapping)
 
     def __init__(self, NYTimesBookList):
         self.list_name_encoded = NYTimesBookList.list_name_encoded
