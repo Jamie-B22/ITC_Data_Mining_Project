@@ -1,6 +1,6 @@
 # ITC Data Mining Project
 
-###### Current status: This is an ongoing project. This readme currently details the progress made as of the second checkpoint where data is scraped into a MySQL database.
+###### Current status: This is an ongoing project. This readme currently details the progress made as of the third checkpoint where data is scraped into a MySQL database and can be enriched from the Open Library API and the NYT bestsellers lists API.
 
 ### Description
 
@@ -17,12 +17,17 @@ The web scraper was created as a project as part of the Data Science Fellows Pro
 Parameters:
 
 
-| Type | Detail | Example |
-| :--- | :----------- | :-------- |
+| Type | Detail | Example | Notes |
+| :--- | :----------- | :-------- | :--- |
 | `most-popular` | `[YYYYMM]` | `most-popular 202001` |
 | `most-read` | `COUNTRYperiod` | `most-read ILm` |
 | `new-releases` | `genre` | `new-releases fantasy` |
 | `custom-list` | `customID` | `custom-list 121572` |
+| `NYT-API-update-all` | `[YYYY-MM-DD or 'current']` | `NYT-API-update-all 20200122` |
+| `NYT-API-update-all` | `[NYT bestsellers list],[YYYY-MM-DD or 'current']` | `NYT-API-update-list combined-print-and-e-book-fiction,current` | All valid `[NYT bestsellers list]` values can be found by passing the Type `get-NYT-bestesller-list-names`. |
+| `get-NYT-bestesller-list-names` | *leave blank* | `get-NYT-bestesller-list-names`  | Prints out all valid `[NYT bestsellers list]` values for the user to refer to. |
+
+
 
 #### Example:
 
