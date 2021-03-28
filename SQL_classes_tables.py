@@ -92,13 +92,6 @@ update_edition_mapping = Table(
     Column("edition_id", Integer, ForeignKey("editions.id"))
 )
 
-# edition_nyt_bestseller_mapping = Table(
-#     "edition_nyt_bestseller_mapping",
-#     Base.metadata,
-#     Column("edition_id", Integer, ForeignKey("editions.id")),
-#     Column("nyt_bestseller_isbn", String(13), ForeignKey("nyt_bestseller_isbns.isbn"))
-# )
-
 
 nyt_bestseller_isbn_list_mapping = Table(
     "nyt_bestseller_isbn_list_mapping",
@@ -106,13 +99,6 @@ nyt_bestseller_isbn_list_mapping = Table(
     Column("lists_id", Integer, ForeignKey("nyt_bestseller_lists.id")),
     Column("isbn", String(13), ForeignKey("nyt_bestseller_isbns.isbn"))
 )
-
-# edition_goodreads_ids_mapping = Table(
-#     "edition_goodreads_ids_mapping",
-#     Base.metadata,
-#     Column("goodreadsid_id", Integer, ForeignKey("openlibrary_goodreads.id")),
-#     Column("edition_id", Integer, ForeignKey("editions.id"))
-# )
 
 
 class BookUpdate(Base):

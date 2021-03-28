@@ -219,7 +219,8 @@ def update_db(books, list_url, list_type, list_details, engine):
 
 
 def NYT_list_create_and_commit_data(book_list, session):
-    isbn_instances = [isbn_relationships_creater_and_adder(isbn, session) for isbn in book_list.get_isbn13s()]
+    isbn_instances = [isbn_relationships_creater_and_adder(isbn, session) for isbn in set(book_list.get_isbn13s()
+                                                                                          + book_list.get_isbn10s())]
     NYT_list_relationships_creater_and_adder(isbn_instances, book_list, session)
     session.commit()
     logger.info(f'{len(book_list.get_isbn13s())} isbns and corresponding list committed to database.')

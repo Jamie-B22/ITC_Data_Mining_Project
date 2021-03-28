@@ -34,7 +34,7 @@ CREATE TABLE `authors` (
   `name` varchar(250) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -51,7 +51,7 @@ CREATE TABLE `book_updates` (
   `qty_reviews` int DEFAULT NULL,
   `scrape_datetime` varchar(25) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -65,7 +65,7 @@ CREATE TABLE `descriptions` (
   `id` int NOT NULL AUTO_INCREMENT,
   `description` varchar(10000) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -128,15 +128,20 @@ DROP TABLE IF EXISTS `editions`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `editions` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `goodreads_id` int DEFAULT NULL,
+  `goodreads_id` varchar(250) DEFAULT NULL,
+  `isbn` varchar(13) DEFAULT NULL,
   `title` varchar(250) DEFAULT NULL,
   `format` varchar(250) DEFAULT NULL,
   `number_in_series` varchar(250) DEFAULT NULL,
   `release_date` varchar(10) DEFAULT NULL,
   `first_published_date` varchar(10) DEFAULT NULL,
   `qty_rpages` int DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  PRIMARY KEY (`id`),
+  KEY `goodreads_id` (`goodreads_id`),
+  KEY `isbn` (`isbn`),
+  CONSTRAINT `editions_ibfk_1` FOREIGN KEY (`goodreads_id`) REFERENCES `openlibrary_goodreads` (`goodreads_id`),
+  CONSTRAINT `editions_ibfk_2` FOREIGN KEY (`isbn`) REFERENCES `nyt_bestseller_isbns` (`isbn`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -151,7 +156,7 @@ CREATE TABLE `genres` (
   `name` varchar(250) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -168,7 +173,191 @@ CREATE TABLE `lists` (
   `url` varchar(500) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `url` (`url`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `nyt_bestseller_isbn_list_mapping`
+--
+
+DROP TABLE IF EXISTS `nyt_bestseller_isbn_list_mapping`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `nyt_bestseller_isbn_list_mapping` (
+  `lists_id` int DEFAULT NULL,
+  `isbn` varchar(13) DEFAULT NULL,
+  KEY `lists_id` (`lists_id`),
+  KEY `isbn` (`isbn`),
+  CONSTRAINT `nyt_bestseller_isbn_list_mapping_ibfk_1` FOREIGN KEY (`lists_id`) REFERENCES `nyt_bestseller_lists` (`id`),
+  CONSTRAINT `nyt_bestseller_isbn_list_mapping_ibfk_2` FOREIGN KEY (`isbn`) REFERENCES `nyt_bestseller_isbns` (`isbn`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `nyt_bestseller_isbns`
+--
+
+DROP TABLE IF EXISTS `nyt_bestseller_isbns`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `nyt_bestseller_isbns` (
+  `isbn` varchar(13) NOT NULL,
+  PRIMARY KEY (`isbn`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `nyt_bestseller_lists`
+--
+
+DROP TABLE IF EXISTS `nyt_bestseller_lists`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `nyt_bestseller_lists` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `list_name_encoded` varchar(250) DEFAULT NULL,
+  `date` varchar(10) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=61 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `openlibrary_book`
+--
+
+DROP TABLE IF EXISTS `openlibrary_book`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `openlibrary_book` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `openlibrary_id` varchar(50) DEFAULT NULL,
+  `title` varchar(250) DEFAULT NULL,
+  `author` varchar(50) DEFAULT NULL,
+  `edition_count` int DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `openlibrary_goodreads`
+--
+
+DROP TABLE IF EXISTS `openlibrary_goodreads`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `openlibrary_goodreads` (
+  `goodreads_id` varchar(250) NOT NULL,
+  PRIMARY KEY (`goodreads_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `openlibrary_goodreads_mapping`
+--
+
+DROP TABLE IF EXISTS `openlibrary_goodreads_mapping`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `openlibrary_goodreads_mapping` (
+  `open_library_book_id` int DEFAULT NULL,
+  `goodreads_id` varchar(250) DEFAULT NULL,
+  KEY `open_library_book_id` (`open_library_book_id`),
+  KEY `goodreads_id` (`goodreads_id`),
+  CONSTRAINT `openlibrary_goodreads_mapping_ibfk_1` FOREIGN KEY (`open_library_book_id`) REFERENCES `openlibrary_book` (`id`),
+  CONSTRAINT `openlibrary_goodreads_mapping_ibfk_2` FOREIGN KEY (`goodreads_id`) REFERENCES `openlibrary_goodreads` (`goodreads_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `openlibrary_isbn`
+--
+
+DROP TABLE IF EXISTS `openlibrary_isbn`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `openlibrary_isbn` (
+  `isbn` varchar(13) NOT NULL,
+  PRIMARY KEY (`isbn`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `openlibrary_isbn_mapping`
+--
+
+DROP TABLE IF EXISTS `openlibrary_isbn_mapping`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `openlibrary_isbn_mapping` (
+  `open_library_book_id` int DEFAULT NULL,
+  `isbn` varchar(13) DEFAULT NULL,
+  KEY `open_library_book_id` (`open_library_book_id`),
+  KEY `isbn` (`isbn`),
+  CONSTRAINT `openlibrary_isbn_mapping_ibfk_1` FOREIGN KEY (`open_library_book_id`) REFERENCES `openlibrary_book` (`id`),
+  CONSTRAINT `openlibrary_isbn_mapping_ibfk_2` FOREIGN KEY (`isbn`) REFERENCES `openlibrary_isbn` (`isbn`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `openlibrary_languages`
+--
+
+DROP TABLE IF EXISTS `openlibrary_languages`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `openlibrary_languages` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `language` varchar(10) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=43 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `openlibrary_languages_mapping`
+--
+
+DROP TABLE IF EXISTS `openlibrary_languages_mapping`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `openlibrary_languages_mapping` (
+  `open_library_book_id` int DEFAULT NULL,
+  `language_id` int DEFAULT NULL,
+  KEY `open_library_book_id` (`open_library_book_id`),
+  KEY `language_id` (`language_id`),
+  CONSTRAINT `openlibrary_languages_mapping_ibfk_1` FOREIGN KEY (`open_library_book_id`) REFERENCES `openlibrary_book` (`id`),
+  CONSTRAINT `openlibrary_languages_mapping_ibfk_2` FOREIGN KEY (`language_id`) REFERENCES `openlibrary_languages` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `openlibrary_publish_years`
+--
+
+DROP TABLE IF EXISTS `openlibrary_publish_years`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `openlibrary_publish_years` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `year` int DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `openlibrary_publish_years_mapping`
+--
+
+DROP TABLE IF EXISTS `openlibrary_publish_years_mapping`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `openlibrary_publish_years_mapping` (
+  `open_library_book_id` int DEFAULT NULL,
+  `publish_year_id` int DEFAULT NULL,
+  KEY `open_library_book_id` (`open_library_book_id`),
+  KEY `publish_year_id` (`publish_year_id`),
+  CONSTRAINT `openlibrary_publish_years_mapping_ibfk_1` FOREIGN KEY (`open_library_book_id`) REFERENCES `openlibrary_book` (`id`),
+  CONSTRAINT `openlibrary_publish_years_mapping_ibfk_2` FOREIGN KEY (`publish_year_id`) REFERENCES `openlibrary_publish_years` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -183,7 +372,7 @@ CREATE TABLE `series` (
   `name` varchar(250) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -246,4 +435,4 @@ CREATE TABLE `update_list_mapping` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-03-09 10:27:37
+-- Dump completed on 2021-03-28 17:50:30
