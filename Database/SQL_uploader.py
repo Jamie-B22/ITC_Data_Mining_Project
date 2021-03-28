@@ -171,6 +171,8 @@ def list_and_relationships_creator_and_adder(list_url, list_type, list_details, 
     return book_list
 
 def isbn_relationships_creator_and_adder(isbn, session):
+    """Creates or fetches existing NYT isbn instance and creates relationship with the edition. Then adds these to the
+    database."""
     isbn_instance = get_isbn13(isbn, session)
     edition = get_edition_from_isbn(isbn, session)
     if edition is not None:
@@ -179,6 +181,8 @@ def isbn_relationships_creator_and_adder(isbn, session):
     return isbn_instance
 
 def NYT_list_relationships_creater_and_adder(isbn_instances, book_list, session):
+    """Creates or fetches existing NYT bestsellers list instance and creates relationship with the isbns on the list.
+    Then adds these to the database."""
     NYT_list = get_NYT_list(book_list, session)
     NYT_list.nyt_bestseller_isbns += isbn_instances
     session.add(NYT_list)
@@ -216,6 +220,7 @@ def update_db(books, list_url, list_type, list_details, engine):
 
 
 def NYT_list_create_and_commit_data(book_list, session):
+    """Creates OLISBN and NYTBestsellerList instances, relates them and commits them to the db """
     isbn_instances = [isbn_relationships_creator_and_adder(isbn, session) for isbn in set(book_list.get_isbn13s()
                                                                                           + book_list.get_isbn10s())]
     NYT_list_relationships_creater_and_adder(isbn_instances, book_list, session)
@@ -224,6 +229,7 @@ def NYT_list_create_and_commit_data(book_list, session):
 
 
 def NYT_API_update_db(book_list, engine):
+    """Takes a NYT bestseller list and updates the db accordingly."""
     logger.info(f'Attempting to upload {len(book_list.get_isbn13s())} NYT bestseller isbns to database.')
     session = initialise_session(engine)
     NYT_list_create_and_commit_data(book_list, session)
@@ -234,6 +240,8 @@ def NYT_API_update_db(book_list, engine):
 # ############# Open Library Books ###############
 
 def get_OpenLibraryBook(OL_book, session):
+    """Checks if the OpenLibraryBook associated with the open library id exists in the db already. If exists, returns
+    that OpenLibraryBook object, if not creates and returns a new one."""
     qry = session.query(OpenLibraryBook).filter(OpenLibraryBook.openlibrary_id == OL_book.Openlibrary_id).all()
     if len(qry) == 0:
         book = OpenLibraryBook(OL_book)
@@ -242,6 +250,8 @@ def get_OpenLibraryBook(OL_book, session):
     return book
 
 def get_publishyear(year, session):
+    """Checks if the year exists in the db already. If exists, returns that PublishYear object, if not creates and
+    returns a new one."""
     qry = session.query(PublishYear).filter(PublishYear.year == year).all()
     if len(qry) == 0:
         year = PublishYear(year)
@@ -251,10 +261,13 @@ def get_publishyear(year, session):
 
 
 def get_publishyear_collection(years, session):
+    """Builds a list of PublishYear instances for the years passed to the function"""
     return [get_publishyear(year, session) for year in set(years)]
 
 
 def get_olisbn(isbn, session):
+    """Checks if the year exists in the db already in the Open Library tables. If exists, returns that OLISBN object,
+    if not creates and returns a new one."""
     qry = session.query(OLISBN).filter(OLISBN.isbn == isbn).all()
     if len(qry) == 0:
         isbn = OLISBN(isbn)
@@ -264,10 +277,13 @@ def get_olisbn(isbn, session):
 
 
 def get_olisbn_collection(isbns, session):
+    """Builds a list of OLISBN instances for the isbns passed to the function"""
     return [get_olisbn(isbn, session) for isbn in set(isbns)]
 
 
 def get_language(language, session):
+    """Checks if the language exists in the db already. If exists, returns that Language object, if not creates and
+        returns a new one."""
     qry = session.query(Language).filter(Language.language == language).all()
     if len(qry) == 0:
         lang = Language(language)
@@ -277,10 +293,13 @@ def get_language(language, session):
 
 
 def get_language_collection(languages, session):
+    """Builds a list of Language instances for the languages passed to the function"""
     return [get_language(language, session) for language in set(languages)]
 
 
 def get_goodreads_id(goodreads_id, session):
+    """Checks if the goodreads id exists in the Open Library tables in the db already. If exists, returns that
+    GoodreadsID object, if not creates and returns a new one."""
     qry = session.query(GoodreadsID).filter(GoodreadsID.goodreads_id == goodreads_id).all()
     if len(qry) == 0:
         id = GoodreadsID(goodreads_id)
@@ -290,6 +309,7 @@ def get_goodreads_id(goodreads_id, session):
 
 
 def get_goodreads_id_collection(goodreads_ids, session):
+    """Builds a list of GoodreadsID instances for the goodreads_ids passed to the function"""
     return [get_goodreads_id(goodreads_id, session) for goodreads_id in set(goodreads_ids)]
 
 
