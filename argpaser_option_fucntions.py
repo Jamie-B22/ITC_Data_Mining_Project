@@ -52,7 +52,8 @@ def NYT_API_update_list(list_date_detail):
 
 
 def NYT_bestesller_list_names():
-    logger.debug('Getting and printing to terminal NYT Bestseller encoded list names.')
+    """Prints to stdout the possible list names you can give to the argpaser."""
+    logger.debug('Getting and printing to stdout the NYT Bestseller encoded list names.')
     encoded_list_names = NYTimesBookList.get_list_names_encoded(NYT_API_KEY)
     print('NYT bestseller list names (encoded in format that can be passed to this program):')
     for num, name in enumerate(encoded_list_names):
