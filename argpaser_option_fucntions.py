@@ -6,8 +6,9 @@ Author: Jamie Bamforth
 
 from config import *
 from APIs.Class_NYTimes_List import NYTimesBookList
-from Database.SQL_uploader import NYT_API_update_db
+from Database.SQL_uploader import NYT_API_update_db, OL_API_update_db
 from Database.SQL_classes_tables import initialise_engine_and_base
+from APIs.OpenLibrary_API_Search import author_search, title_search, isbn_search, OpenLibraryBookInstance
 import logging
 import time
 import sys
@@ -66,6 +67,44 @@ def NYT_bestesller_list_names(blank_option_arg_placeholder = None):
         print(f'{num}. "{name}"')
     print('---end of list names---')
 
+
+def OL_API_update_by_author(author):
+    """
+    Takes an author name and uploads all books by this author from Open Library
+    """
+    logger.debug('Initialising engine.')
+    engine = initialise_engine_and_base()
+    logger.debug('Getting OpenLibrary books by Author')
+    books = author_search(author)
+    for book_dict in books:
+        book = OpenLibraryBookInstance(book_dict)
+        OL_API_update_db(book, engine)
+
+
+def OL_API_update_by_title(title):
+    """
+    Takes a book title and uploads to the database all books returned from Open Library with similar titles
+    """
+    logger.debug('Initialising engine.')
+    engine = initialise_engine_and_base()
+    logger.debug('Getting OpenLibrary books by Title')
+    books = title_search(title)
+    for book_dict in books:
+        book = OpenLibraryBookInstance(book_dict)
+        OL_API_update_db(book, engine)
+
+
+def OL_API_update_by_isbn(isbn):
+    """
+    Takes an ISBN and uploads to the database the book returned from Open Library with this ISBN
+    """
+    logger.debug('Initialising engine.')
+    engine = initialise_engine_and_base()
+    logger.debug('Getting OpenLibrary books by ISBN')
+    books = isbn_search(isbn)
+    for book_dict in books:
+        book = OpenLibraryBookInstance(book_dict)
+        OL_API_update_db(book, engine)
 
 
 
