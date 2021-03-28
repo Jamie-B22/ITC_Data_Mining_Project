@@ -7,9 +7,8 @@ Author: Jamie Bamforth
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import exc
 import logging
-from SQL_classes_tables import Author, Series, Genre, Description, Edition, List, BookUpdate,\
-    , NYTBestsellerList, NYTBestsellerISBN, OpenLibraryBook, PublishYear,\
-    OLISBN, Language, GoodreadsID
+from Database.SQL_classes_tables import Author, Series, Genre, Description, Edition, List, BookUpdate,\
+    NYTBestsellerList, NYTBestsellerISBN, OpenLibraryBook, PublishYear, OLISBN, Language, GoodreadsID
 
 
 """Setup Logger"""
@@ -171,7 +170,7 @@ def list_and_relationships_creator_and_adder(list_url, list_type, list_details, 
     session.add(book_list)
     return book_list
 
-def isbn_relationships_creater_and_adder(isbn, session):
+def isbn_relationships_creator_and_adder(isbn, session):
     isbn_instance = get_isbn13(isbn, session)
     edition = get_edition_from_isbn(isbn, session)
     if edition is not None:
@@ -217,7 +216,7 @@ def update_db(books, list_url, list_type, list_details, engine):
 
 
 def NYT_list_create_and_commit_data(book_list, session):
-    isbn_instances = [isbn_relationships_creater_and_adder(isbn, session) for isbn in set(book_list.get_isbn13s()
+    isbn_instances = [isbn_relationships_creator_and_adder(isbn, session) for isbn in set(book_list.get_isbn13s()
                                                                                           + book_list.get_isbn10s())]
     NYT_list_relationships_creater_and_adder(isbn_instances, book_list, session)
     session.commit()
@@ -305,8 +304,6 @@ def book_and_relationships_creator_and_adder(OL_book, session):
     goodreads_id_collection = get_goodreads_id_collection(OL_book.ID_goodreads, session)
     book.goodreads_ids += goodreads_id_collection
     # TODO: link to goodreads
-
-
     session.add(book)
 
 

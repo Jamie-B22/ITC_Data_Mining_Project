@@ -1,9 +1,9 @@
-from Goodreads_book_scraper import book_scraper
-from Goodreads_list_scraper import list_scraper
+from Scraper.Goodreads_book_scraper import book_scraper
+from Scraper.Goodreads_list_scraper import list_scraper
 from Class_book_record import BookRecord
 from Database.SQL_uploader import update_db
 from Database.SQL_classes_tables import initialise_engine_and_base
-from scrape_error import ScrapeError
+from Scraper.scrape_error import ScrapeError
 from config import *
 import datetime as dt
 import time

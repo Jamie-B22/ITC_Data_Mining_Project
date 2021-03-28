@@ -7,8 +7,7 @@ Authors: Jamie Bamforth and Jordan Ribbans
 import requests
 import bs4
 import logging
-import sys
-from scrape_error import ScrapeError
+from Scraper.scrape_error import ScrapeError
 from config import *
 
 logger = logging.getLogger('main')

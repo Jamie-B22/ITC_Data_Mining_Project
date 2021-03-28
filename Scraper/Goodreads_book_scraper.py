@@ -27,7 +27,6 @@ import time
 import random
 from config import *
 import logging
-import sys
 
 logger = logging.getLogger('main')
 logger.setLevel(logging.DEBUG)
