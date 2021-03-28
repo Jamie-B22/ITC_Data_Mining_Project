@@ -226,7 +226,6 @@ def NYT_list_create_and_commit_data(book_list, session):
 
 
 def NYT_API_update_db(book_list, engine):
-    print(book_list.get_isbn10s())
     logger.info(f'Attempting to upload {len(book_list.get_isbn13s())} NYT bestseller isbns to database.')
     session = initialise_session(engine)
     NYT_list_create_and_commit_data(book_list, session)
