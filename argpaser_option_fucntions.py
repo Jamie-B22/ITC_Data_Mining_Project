@@ -34,7 +34,7 @@ def NYT_API_update_all(date):
         logger.debug(f'{list_name} uploaded to db.')
         time.sleep(ANTI_THROTTLE_DELAY_S)
         if num%9 == 0:
-            time.sleep(30) # needs more wait time for some reason
+            time.sleep(60) # needs more wait time for some reason
     logger.info('Success: NYT bestseller lists uploaded to database.')
 
 
