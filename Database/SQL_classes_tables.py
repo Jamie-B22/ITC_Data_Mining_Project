@@ -476,13 +476,13 @@ class OLISBN(Base):
     ISBNs. Instance is initiated with below parameters taken directly from a OpenLibraryBookInstance class instance.
     id is created sequentially as primary key.
     Parameters:
-        isbn : str
+        isbn : str - alphanumeric code of length 10 or 13 (Primary Key)
 
     Relationships with:
         openlibrary_book >< this class
     """
     __tablename__ = 'openlibrary_isbn'
-    isbn : str - alphanumeric code of length 10 or 13 (Primary Key)
+    isbn = Column('isbn', String(13), primary_key=True)
 
     OLbook = relationship('OpenLibraryBook', secondary=openlibrary_isbn_mapping)
 
