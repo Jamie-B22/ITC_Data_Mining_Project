@@ -11,5 +11,12 @@ PAGES_WORD_INDEX_IN_TEXT = 0
 THROTTLING_STATUS_CODE = 403
 OUTPUT_FILE_NAME = "scrape_data.csv"
 
+
 # Constant url root to which the unique Goodreads ID of a book is appended to access the Goodreads page for that book
 ROOT_BOOK_URL = "http://www.goodreads.com/book/show/"
+
+
+# For the NYT API
+NYT_API_KEY = 'gyAYYsc5MUxhVHVQD3AFDQznc084UhQp'
+NYT_API_BASE_URL = 'https://api.nytimes.com/svc/books/v3/lists'
+NYT_API_END_URL = '.json?api-key='
