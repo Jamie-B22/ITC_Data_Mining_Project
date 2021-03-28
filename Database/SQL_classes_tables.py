@@ -221,7 +221,7 @@ class Description(Base):
     """
     __tablename__ = 'descriptions'
     id = Column('id', Integer, primary_key=True)
-    description = Column('description', String(10000))  # TODO:deal with error string is too long (truncate str[:10000])
+    description = Column('description', String(10000))  # TODO: deal with error string is too long (truncate str[:10000])
     book_updates = relationship('BookUpdate', secondary=update_description_mapping)
 
     def __init__(self, description):
@@ -318,8 +318,18 @@ class Edition(Base):
     def __str__(self):
         return str(self.__dict__.values())
 
-class NYTBestsellerISBN(Base):
 
+class NYTBestsellerISBN(Base):
+    """Class inheriting from dectarative_base() instance Base that allows instances to be created to store the unique
+        ISBNs associated with books on NYT Bestsellers Lists. Instance is initiated with below parameters taken directly
+        from a NYTimesBookList class instance.
+        Parameters:
+            isbn : str - alphanumeric code of length 10 or 13 (Primary Key)
+
+        Relationships with:
+            Editions - this class
+            NYTBestsellerList >< this class
+        """
     __tablename__ = 'nyt_bestseller_isbns'
     isbn = Column('isbn', String(13), primary_key=True)
 
@@ -335,7 +345,17 @@ class NYTBestsellerISBN(Base):
 
 
 class NYTBestsellerList(Base):
+    """Class inheriting from dectarative_base() instance Base that allows instances to be created to store the unique
+        NYT Bestsellers Lists published on a certain date. Instance is initiated with below parameters taken directly
+        from a NYTimesBookList class instance.
+        Parameters:
+            id : int - primary key in database table
+            list_name_encoded : str
+            date : str (format YYYY-MM-DD)
 
+        Relationships with:
+            NYTBestsellerISBN >< this class
+        """
     __tablename__ = 'nyt_bestseller_lists'
     id = Column('id', Integer, primary_key=True)
     list_name_encoded = Column('list_name_encoded', String(250))
@@ -456,14 +476,13 @@ class OLISBN(Base):
     ISBNs. Instance is initiated with below parameters taken directly from a OpenLibraryBookInstance class instance.
     id is created sequentially as primary key.
     Parameters:
-        id : int - primary key in database table
         isbn : str
 
     Relationships with:
         openlibrary_book >< this class
     """
     __tablename__ = 'openlibrary_isbn'
-    isbn = Column('isbn', String(13), primary_key=True)
+    isbn : str - alphanumeric code of length 10 or 13 (Primary Key)
 
     OLbook = relationship('OpenLibraryBook', secondary=openlibrary_isbn_mapping)
 
@@ -498,11 +517,11 @@ class GoodreadsID(Base):
     GoodRead IDs. Instance is initiated with below parameters taken directly from a OpenLibraryBookInstance class instance.
     id is created sequentially as primary key.
     Parameters:
-        id : int - primary key in database table
-        year : int
+        goodreads_id : string   (Primary Key)
 
     Relationships with:
         openlibrary_book >< this class
+        Edition - this class
     """
     __tablename__ = 'openlibrary_goodreads'
     goodreads_id = Column('goodreads_id', String(250), primary_key=True)
