@@ -314,6 +314,9 @@ def get_goodreads_id_collection(goodreads_ids, session):
 
 
 def book_and_relationships_creator_and_adder(OL_book, session):
+    """Takes an OpenLibraryBookInstance and uses its parameters and methods to provide the data required to build the
+    objectis and relationships for the Open Library part of the database. adds these objects and their connections to
+    the database when finished after creation."""
     book = get_OpenLibraryBook(OL_book, session)
     publishyear_collection = get_publishyear_collection(OL_book.Publish_years, session)
     book.publish_years += publishyear_collection
@@ -329,6 +332,8 @@ def book_and_relationships_creator_and_adder(OL_book, session):
 
 
 def OL_book_create_and_commit_data(OL_book, session):
+    """Creates, adds and commits objects and relationships in Open Library part of database with the data in OL_book, an
+    OpenLibraryBookInstance"""
     book_and_relationships_creator_and_adder(OL_book, session)
     session.commit()
     logger.info(f'Open Library book ISBN {OL_book.ISBN} committed to database.')
@@ -336,6 +341,8 @@ def OL_book_create_and_commit_data(OL_book, session):
 
 
 def OL_API_update_db(OL_book, engine):
+    """Updates Open Library part of database with open library book data retrieved from the API stored in OL_book, an
+    OpenLibraryBookInstance"""
     logger.info(f'Attempting to upload Open Library book ISBN {OL_book.ISBN} to database.')
     session = initialise_session(engine)
     OL_book_create_and_commit_data(OL_book, session)
