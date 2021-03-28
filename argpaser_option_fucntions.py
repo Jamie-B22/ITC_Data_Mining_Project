@@ -29,12 +29,17 @@ def NYT_API_update_all(date):
     for num, list_name in enumerate(encoded_list_names):
         logger.info(f'Processing list {list_name}')
         logger.debug(f'Fetching NYT Bestseller list {list_name} from API and uploading to db.')
-        book_list = NYTimesBookList(list_name, date, NYT_API_KEY)
+        try:
+            book_list = NYTimesBookList(list_name, date, NYT_API_KEY)
+        except KeyError:
+            logger.info(f'First request for {list_name} from API throttled, waiting 2 minutes and trying again.')
+            time.sleep(120) # if first attempt is throttled, wait 2 mins and try again
+            book_list = NYTimesBookList(list_name, date, NYT_API_KEY)
         NYT_API_update_db(book_list, engine)
         logger.debug(f'{list_name} uploaded to db.')
         time.sleep(ANTI_THROTTLE_DELAY_S)
         if num%9 == 0:
-            time.sleep(60) # needs more wait time for some reason
+            time.sleep(30) # needs more wait time for some reason
     logger.info('Success: NYT bestseller lists uploaded to database.')
 
 
