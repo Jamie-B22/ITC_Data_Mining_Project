@@ -56,8 +56,9 @@ def NYT_API_update_list(list_date_detail):
     logger.info(f'Success: {list_date_detail} uploaded to db.')
 
 
-def NYT_bestesller_list_names():
-    """Prints to stdout the possible list names you can give to the argpaser."""
+def NYT_bestesller_list_names(blank_option_arg_placeholder = None):
+    """Prints to stdout the possible list names you can give to the argpaser.
+    blank_option_arg_placeholder is for compatibility with the way the functions are called in main"""
     logger.debug('Getting and printing to stdout the NYT Bestseller encoded list names.')
     encoded_list_names = NYTimesBookList.get_list_names_encoded(NYT_API_KEY)
     print('NYT bestseller list names (encoded in format that can be passed to this program):')
