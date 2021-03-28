@@ -104,7 +104,7 @@ def list_scraper_tests():
     x = list_scraper('https://www.goodreads.com/book/popular_by_date/2020/12')
     print(x)
     print(len(x))
-
+    print(type(x[0]))
 
 if __name__ == '__main__':
     list_scraper_tests()

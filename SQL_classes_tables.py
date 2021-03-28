@@ -92,27 +92,27 @@ update_edition_mapping = Table(
     Column("edition_id", Integer, ForeignKey("editions.id"))
 )
 
-edition_nyt_bestseller_mapping = Table(
-    "edition_nyt_bestseller_mapping",
-    Base.metadata,
-    Column("edition_id", Integer, ForeignKey("editions.id")),
-    Column("nyt_bestseller_isbn", String(13), ForeignKey("nyt_bestseller_isbns.isbn"))
-)
+# edition_nyt_bestseller_mapping = Table(
+#     "edition_nyt_bestseller_mapping",
+#     Base.metadata,
+#     Column("edition_id", Integer, ForeignKey("editions.id")),
+#     Column("nyt_bestseller_isbn", String(13), ForeignKey("nyt_bestseller_isbns.isbn"))
+# )
 
 
 nyt_bestseller_isbn_list_mapping = Table(
     "nyt_bestseller_isbn_list_mapping",
     Base.metadata,
-    Column("nyt_bestseller_lists_id", Integer, ForeignKey("nyt_bestseller_lists.id")),
-    Column("nyt_bestseller_isbn", String(13), ForeignKey("nyt_bestseller_isbns.isbn"))
+    Column("lists_id", Integer, ForeignKey("nyt_bestseller_lists.id")),
+    Column("isbn", String(13), ForeignKey("nyt_bestseller_isbns.isbn"))
 )
 
-edition_goodreads_ids_mapping = Table(
-    "edition_goodreads_ids_mapping",
-    Base.metadata,
-    Column("goodreadsid_id", Integer, ForeignKey("openlibrary_goodreads.id")),
-    Column("edition_id", Integer, ForeignKey("editions.id"))
-)
+# edition_goodreads_ids_mapping = Table(
+#     "edition_goodreads_ids_mapping",
+#     Base.metadata,
+#     Column("goodreadsid_id", Integer, ForeignKey("openlibrary_goodreads.id")),
+#     Column("edition_id", Integer, ForeignKey("editions.id"))
+# )
 
 
 class BookUpdate(Base):
@@ -297,8 +297,8 @@ class Edition(Base):
     """
     __tablename__ = 'editions'
     id = Column('id', Integer, primary_key=True)
-    goodreads_id = Column('goodreads_id', Integer)
-    isbn = Column('isbn', String(13))
+    goodreads_id = Column('goodreads_id', String(250), ForeignKey('openlibrary_goodreads.goodreads_id'))
+    isbn = Column('isbn', String(13), ForeignKey('nyt_bestseller_isbns.isbn'))
     title = Column('title', String(250))
     format = Column('format', String(250))
     number_in_series = Column('number_in_series', String(250))
@@ -315,8 +315,8 @@ class Edition(Base):
     # secondary=book_author_mapping is the mapping table
     series = relationship('Series', secondary=edition_series_mapping)
     genres = relationship('Genre', secondary=edition_genre_mapping)
-    nyt_bestsellers_isbns = relationship('NYTBestsellerISBN', secondary=edition_nyt_bestseller_mapping)
-    ol_goodreads_ids = relationship('GoodreadsID', secondary=edition_goodreads_ids_mapping)
+    nyt_bestsellers_isbns = relationship('NYTBestsellerISBN', back_populates='editions')
+    ol_goodreads_id = relationship('GoodreadsID', back_populates='editions')
 
 
     def __init__(self, book_record_instance):
@@ -337,7 +337,8 @@ class NYTBestsellerISBN(Base):
     __tablename__ = 'nyt_bestseller_isbns'
     isbn = Column('isbn', String(13), primary_key=True)
 
-    editions = relationship('Edition', secondary=edition_nyt_bestseller_mapping)
+    # one to one relationship were the 'back_populates' argument is the relationship object defined in 'Edition' class
+    editions = relationship('Edition', uselist=False, back_populates="nyt_bestsellers_isbns")
     nyt_bestseller_lists = relationship('NYTBestsellerList', secondary=nyt_bestseller_isbn_list_mapping)
 
     def __init__(self, isbn):
@@ -378,7 +379,7 @@ openlibrary_isbn_mapping = Table(
     "openlibrary_isbn_mapping",
     Base.metadata,
     Column("open_library_book_id", Integer, ForeignKey("openlibrary_book.id")),
-    Column("isbn_id", Integer, ForeignKey("openlibrary_isbn.id"))
+    Column("isbn", String(13), ForeignKey("openlibrary_isbn.isbn"))
 )
 
 
@@ -393,7 +394,7 @@ openlibrary_goodreads_mapping = Table(
     "openlibrary_goodreads_mapping",
     Base.metadata,
     Column("open_library_book_id", Integer, ForeignKey("openlibrary_book.id")),
-    Column("goodreads_id", Integer, ForeignKey("openlibrary_goodreads.id"))
+    Column("goodreads_id", String(250), ForeignKey("openlibrary_goodreads.goodreads_id"))
 )
 
 
@@ -476,10 +477,10 @@ class OLISBN(Base):
         openlibrary_book >< this class
     """
     __tablename__ = 'openlibrary_isbn'
-    id = Column('id', Integer, primary_key=True)
-    isbn = Column('isbn', String(13))
+    isbn = Column('isbn', String(13), primary_key=True)
 
     OLbook = relationship('OpenLibraryBook', secondary=openlibrary_isbn_mapping)
+
 
     def __init__(self, isbn):
         self.isbn = isbn
@@ -518,11 +519,10 @@ class GoodreadsID(Base):
         openlibrary_book >< this class
     """
     __tablename__ = 'openlibrary_goodreads'
-    id = Column('id', Integer, primary_key=True)
-    goodreads_id = Column('goodreads_id', String(250))
+    goodreads_id = Column('goodreads_id', String(250), primary_key=True)
 
     OLbook = relationship('OpenLibraryBook', secondary=openlibrary_goodreads_mapping)
-    edition = relationship('Edition', secondary=edition_goodreads_ids_mapping)
+    editions = relationship('Edition', uselist=False, back_populates="ol_goodreads_id")
 
     def __init__(self, goodreads_id):
         self.goodreads_id = goodreads_id
