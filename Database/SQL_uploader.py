@@ -6,11 +6,9 @@ Author: Jamie Bamforth
 
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import exc
-import csv
 import logging
-from Class_book_record import BookRecord
 from SQL_classes_tables import Author, Series, Genre, Description, Edition, List, BookUpdate,\
-    initialise_engine_and_base, NYTBestsellerList, NYTBestsellerISBN, OpenLibraryBook, PublishYear,\
+    , NYTBestsellerList, NYTBestsellerISBN, OpenLibraryBook, PublishYear,\
     OLISBN, Language, GoodreadsID
 
 
@@ -330,11 +328,12 @@ def OL_API_update_db(OL_book, engine):
 
 if __name__ == '__main__':
     # for initial testing only, will only run properly on a computer with the test csv.
-    with open('20210121_book_data_b.csv', 'r', newline='') as file:
-        reader = csv.DictReader(file)
-        test_books = [BookRecord(book) for book in reader]
-    print(test_books)
-    scraped_list_url = 'https://www.goodreads.com/book/most_read'
-    type_arg = 'test_type'
-    details_arg = 'test_details'
-    update_db(test_books, scraped_list_url, type_arg, details_arg, initialise_engine_and_base())
+    # with open('20210121_book_data_b.csv', 'r', newline='') as file:
+    #     reader = csv.DictReader(file)
+    #     test_books = [BookRecord(book) for book in reader]
+    # print(test_books)
+    # scraped_list_url = 'https://www.goodreads.com/book/most_read'
+    # type_arg = 'test_type'
+    # details_arg = 'test_details'
+    # update_db(test_books, scraped_list_url, type_arg, details_arg, initialise_engine_and_base())
+    pass

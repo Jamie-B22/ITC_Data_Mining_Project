@@ -6,8 +6,8 @@ Author: Jamie Bamforth
 
 from config import *
 from APIs.Class_NYTimes_List import NYTimesBookList
-from SQL_uploader import NYT_API_update_db
-from SQL_classes_tables import initialise_engine_and_base
+from Database.SQL_uploader import NYT_API_update_db
+from Database.SQL_classes_tables import initialise_engine_and_base
 import logging
 import time
 import sys
