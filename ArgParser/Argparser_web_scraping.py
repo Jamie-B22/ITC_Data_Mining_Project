@@ -90,3 +90,4 @@ def web_scraper(list_type, list_detail):
             write_to_csv(book_data)
             logger.info(f"Data saved to file: {OUTPUT_FILE_NAME}")
             logger.error(f'Error encountered on upload to db: {err}')
+            raise

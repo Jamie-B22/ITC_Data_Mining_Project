@@ -158,6 +158,10 @@ def book_and_relationships_creator_and_adder(book_record_instance, session):
     # TODO: put somewhere that description only exists as a separate table is to save memory,
     #  each description is associated with multiple book title pulls.
     record.description = [description]
+    goodreads_id = get_goodreads_id(book_record_instance.Book_ID, session)
+    edition.ol_goodreads_id = goodreads_id
+    isbn = get_isbn13(book_record_instance.ISBN, session)
+    edition.nyt_bestsellers_isbns = isbn
     session.add(record)
     return record
 
@@ -313,19 +317,23 @@ def get_goodreads_id_collection(goodreads_ids, session):
     return [get_goodreads_id(goodreads_id, session) for goodreads_id in set(goodreads_ids)]
 
 
-def book_and_relationships_creator_and_adder(OL_book, session):
+def OLbook_and_relationships_creator_and_adder(OL_book, session):
     """Takes an OpenLibraryBookInstance and uses its parameters and methods to provide the data required to build the
     objectis and relationships for the Open Library part of the database. adds these objects and their connections to
     the database when finished after creation."""
     book = get_OpenLibraryBook(OL_book, session)
-    publishyear_collection = get_publishyear_collection(OL_book.Publish_years, session)
-    book.publish_years += publishyear_collection
-    isbn_collection = get_olisbn_collection(OL_book.ISBN, session)
-    book.isbns += isbn_collection
-    language_collection = get_language_collection(OL_book.Languages, session)
-    book.languages += language_collection
-    goodreads_id_collection = get_goodreads_id_collection(OL_book.ID_goodreads, session)
-    book.goodreads_ids += goodreads_id_collection
+    if OL_book.Publish_years is not None:
+        publishyear_collection = get_publishyear_collection(OL_book.Publish_years, session)
+        book.publish_years += publishyear_collection
+    if OL_book.ISBN is not None:
+        isbn_collection = get_olisbn_collection(OL_book.ISBN, session)
+        book.isbns += isbn_collection
+    if OL_book.Languages is not None:
+        language_collection = get_language_collection(OL_book.Languages, session)
+        book.languages += language_collection
+    if OL_book.ID_goodreads is not None:
+        goodreads_id_collection = get_goodreads_id_collection(OL_book.ID_goodreads, session)
+        book.goodreads_ids += goodreads_id_collection
     # TODO: link to goodreads
     session.add(book)
 
@@ -334,7 +342,7 @@ def book_and_relationships_creator_and_adder(OL_book, session):
 def OL_book_create_and_commit_data(OL_book, session):
     """Creates, adds and commits objects and relationships in Open Library part of database with the data in OL_book, an
     OpenLibraryBookInstance"""
-    book_and_relationships_creator_and_adder(OL_book, session)
+    OLbook_and_relationships_creator_and_adder(OL_book, session)
     session.commit()
     logger.info(f'Open Library book "{OL_book.Title}" committed to database.')
 

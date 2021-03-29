@@ -58,10 +58,14 @@ class OpenLibraryBookInstance:
         """Instantiate a Book_Record object by passing it a dict of the data required to set it's attribute values"""
         self.Openlibrary_id = data_dict.get('key')
         self.Title = data_dict.get('title')
-        self.Author = data_dict.get('author_name')
+        self.Author = data_dict.get('author_name') if isinstance(data_dict.get('author_name'), str) \
+                                                    else data_dict.get('author_name')[0]
         self.Edition_count = data_dict.get('edition_count')
         self.Publish_years = data_dict.get('publish_year')
-        self.ISBN = [isbn.replace('-','') for isbn in data_dict.get('isbn')]
+        if data_dict.get('isbn') is not None:
+            self.ISBN = [isbn.replace('-','') for isbn in data_dict.get('isbn')]
+        else:
+            self.ISBN = None
         self.Languages = data_dict.get('language')
         self.ID_goodreads = data_dict.get('id_goodreads')
 
@@ -72,13 +76,13 @@ def main():
     # http://openlibrary.org/search.json?isbn=059035342X
 
     # print(*author_search("j k rowling"), sep="\n")
-    # print(author_search("philomena cunk"))
-    print(isbn_search("059035342X"))
-    for i in isbn_search("059035342X"):
-        for key, value in i.items():
-            print(key, ":", type(value))
-            if isinstance(value, list):
-                print(type(value[0]))
+    print(author_search("John Green"))
+    # print(isbn_search("059035342X"))
+    # for i in isbn_search("059035342X"):
+    #     for key, value in i.items():
+    #         print(key, ":", type(value))
+    #         if isinstance(value, list):
+    #             print(type(value[0]))
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
-from Argparser_option_functions import NYT_API_update_all, NYT_API_update_list, NYT_bestesller_list_names, \
+from ArgParser.Argparser_option_functions import NYT_API_update_all, NYT_API_update_list, NYT_bestesller_list_names, \
     OL_API_update_by_isbn, OL_API_update_by_author, OL_API_update_by_title
-from Argparser_web_scraping import web_scraper
+from ArgParser.Argparser_web_scraping import web_scraper
 import argparse
 import logging
 
@@ -47,7 +47,8 @@ def args_dict():
     # otherwise we can insert the second argument into the function from func_dict
     else:
         logger.debug("Command line arguments parsed as loading information from API")
-        func_dict[args.type_action](str(args.detail))
+        func_dict[args.type_action](' '.join(args.detail))
+
 
 
 def main():
