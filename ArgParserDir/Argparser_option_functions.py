@@ -32,7 +32,7 @@ def NYT_API_update_all(date):
             book_list = NYTimesBookList(list_name, date, NYT_API_KEY)
         except KeyError:
             logger.info(f'First request for {list_name} from API throttled, waiting 2 minutes and trying again.')
-            time.sleep(120) # if first attempt is throttled, wait 2 mins and try again
+            time.sleep(120)  # if first attempt is throttled, wait 2 mins and try again
             book_list = NYTimesBookList(list_name, date, NYT_API_KEY)
         try:
             NYT_API_update_db(book_list, engine)
@@ -42,8 +42,8 @@ def NYT_API_update_all(date):
             logger.error(f'Unable to upload {list_name} to db due to {err}.')
 
         time.sleep(ANTI_THROTTLE_DELAY_S)
-        if (num+1)%9 == 0:
-            time.sleep(30) # needs more wait time for some reason
+        if (num+1) % 9 == 0:
+            time.sleep(30)  # needs more wait time for some reason
     logger.info(f'Success: {upload_count}/{len(encoded_list_names)} NYT bestseller lists uploaded to database.')
 
 
@@ -63,6 +63,7 @@ def NYT_API_update_list(list_date_detail):
         logger.error(f'Unable to upload {list_date_detail} to db due to {err}.')
 
 
+# noinspection PyUnusedLocal
 def NYT_bestesller_list_names(blank_option_arg_placeholder=None):
     """Prints to stdout the possible list names you can give to the argpaser.
     blank_option_arg_placeholder is for compatibility with the way the functions are called in main"""
@@ -91,7 +92,6 @@ def OL_API_update_by_author(author):
                 logger.error(f'Unable to upload {book.Title} to db due to {err}.')
     else:
         logger.info(f"No results returned for {author}")
-
 
 
 def OL_API_update_by_title(title):
@@ -132,7 +132,6 @@ def OL_API_update_by_isbn(isbn):
         logger.info(f"No results returned for {isbn}")
 
 
-
 if __name__ == '__main__':
     # some tests to check it runs as expected and logging to help debug
 
@@ -148,7 +147,6 @@ if __name__ == '__main__':
     file_handler.setLevel(logging.DEBUG)
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
-
 
     # print(NYTimesBookList('hardcover-graphic-books', 'current', NYT_API_KEY))
     NYT_bestesller_list_names()

@@ -11,8 +11,8 @@ def open_library_docs_info(dictionary):
     book_results = []
     for i in range(len(dictionary["docs"])):
         book_data = {key: value for key, value in dictionary["docs"][i].items()
-                     if key in ["title", "key", "author_name", "edition_count"
-                         , "publish_year", "isbn", "language", "id_goodreads", "author_key"]}
+                     if key in ["title", "key", "author_name", "edition_count",
+                                "publish_year", "isbn", "language", "id_goodreads", "author_key"]}
         book_results.append(book_data)
     return book_results
 
@@ -56,6 +56,7 @@ def all_search(search):
     ol_dict = json.loads(response.text)
     return open_library_docs_info(ol_dict)
 
+
 class OpenLibraryBookInstance:
     """
     Class for storing OpenLibrary book data to a table
@@ -70,6 +71,7 @@ class OpenLibraryBookInstance:
 
     Author: Jordan Ribbans
     """
+
     def __init__(self, data_dict):
         """Instantiate a Book_Record object by passing it a dict of the data required to set it's attribute values"""
         # suffix of .encode('ascii', errors='ignore').decode('utf-8') is to fix encoding errors to UTF-8 by dropping
@@ -79,20 +81,19 @@ class OpenLibraryBookInstance:
         self.Title = data_dict.get('title').encode('ascii', errors='ignore').decode('utf-8')[:250]
         if data_dict.get('author_name') is not None:
             # returns the author name if the field is just a string, otherwise returns first element of list
-            self.Author = (data_dict.get('author_name')[:250] if isinstance(data_dict.get('author_name'), str) \
-            else data_dict.get('author_name')[0]).encode('ascii', errors='ignore').decode('utf-8')[:250]
+            self.Author = (data_dict.get('author_name')[:250] if isinstance(data_dict.get('author_name'), str)
+                           else data_dict.get('author_name')[0]).encode('ascii', errors='ignore').decode('utf-8')[:250]
         else:
             self.Author = None
         self.Edition_count = data_dict.get('edition_count')
         self.Publish_years = data_dict.get('publish_year')
         if data_dict.get('isbn') is not None:
-            self.ISBN = [isbn.replace('-','').encode('ascii', errors='ignore').decode('utf-8') for isbn
+            self.ISBN = [isbn.replace('-', '').encode('ascii', errors='ignore').decode('utf-8') for isbn
                          in data_dict.get('isbn')]
         else:
             self.ISBN = None
         self.Languages = data_dict.get('language')
         self.ID_goodreads = data_dict.get('id_goodreads')
-
 
 
 def main():

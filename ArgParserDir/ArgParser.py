@@ -1,6 +1,6 @@
-from ArgParser.Argparser_option_functions import NYT_API_update_all, NYT_API_update_list, NYT_bestesller_list_names, \
+from ArgParserDir.Argparser_option_functions import NYT_API_update_all, NYT_API_update_list, NYT_bestesller_list_names,\
     OL_API_update_by_isbn, OL_API_update_by_author, OL_API_update_by_title
-from ArgParser.Argparser_web_scraping import web_scraper
+from ArgParserDir.Argparser_web_scraping import web_scraper
 import argparse
 import logging
 
@@ -27,7 +27,7 @@ def args_dict():
     # second argument contains details to go into function
     second_arg = ['YYYYMM', 'COUNTRYperiod(eg ILm)', 'genre', 'customID', 'YYYY-MM-DD', 'author/title/isbn']
 
-    # if scraping from goodreadss, two arguments are needed so they are parsed differently
+    # if scraping from goodreads, two arguments are needed so they are parsed differently
     scraper_arguments = ['most-popular', 'most-read', 'new-releases', 'custom-list']
 
     logger.debug("Parsing command line arguments")
@@ -48,7 +48,6 @@ def args_dict():
     else:
         logger.debug("Command line arguments parsed as loading information from API")
         func_dict[args.type_action](' '.join(args.detail))
-
 
 
 def main():

@@ -18,7 +18,7 @@ def list_url(l_type, l_detail):
     """ Creates the URL of a Goodreads list based on system arguments.
     Defaults to most read this week in local country if none entered. """
 
-    if l_type == "most-popular": # edit on 17/03/2021: new url format means leading zeros on month need to be removed
+    if l_type == "most-popular":  # edit on 17/03/2021: new url format means leading zeros on month need to be removed
         return BASE_URL + "book/popular_by_date/" + str(l_detail)[:YEAR_INDEX] + "/" \
                + str(int(str(l_detail)[YEAR_INDEX:]))
     if l_type == "most-read":
