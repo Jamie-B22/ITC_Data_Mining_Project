@@ -6,6 +6,10 @@
 
 This web scraper finds, scrapes and stores details of books from [GoodReads](https://www.goodreads.com/). It works by taking the user's selection of a goodreads list and scraping and storing the details of all books on that list. The data will be stored in a MySQL database (structure detailed below), or into a CSV file if it is unable to make a connection to the database.
 
+The data scraped from Goodreads can be enriched with data from:
+* The [New York Times (NYT) Books API](https://developer.nytimes.com/docs/books-product/1/overview), which provides details of books on the current and past NYT bestseller lists.
+* The [Open Library Books API](https://openlibrary.org/dev/docs/api/books), which provides data about the various editions of titles that have been published.
+
 The web scraper was created as a project as part of the Data Science Fellows Program at [ITC](https://www.itc.tech/).
 
 ### Usage
@@ -17,10 +21,12 @@ Parameters:
 
 | Type | Detail | Example |
 | :--- | :----------- | :-------- |
+| **Scraping** |
 | `most-popular` | `[YYYYMM]` | `most-popular 202001` |
 | `most-read` | `[COUNTRYperiod]` | `most-read ILm` |
 | `new-releases` | `[genre]` | `new-releases fantasy` |
 | `custom-list` | `[customID]` | `custom-list 121572` |
+| **Enrichment** |
 | `NYT-API-update-all` | `[YYYY-MM-DD or 'current']` | `NYT-API-update-all 20200122` |
 | `NYT-API-update-list` | `"[NYT bestsellers list],[YYYY-MM-DD or 'current']"`* | `NYT-API-update-list combined-print-and-e-book-fiction,current` |
 | `get-NYT-bestesller-list-names` | *leave blank* | `get-NYT-bestesller-list-names`  |
@@ -28,7 +34,7 @@ Parameters:
 | `OL-author-search` | `[author name]` | `OL-title-search J K Rowling` |
 | `OL-ISBN-search` | `[ISBN]` | `OL-title-search 059035342X` |
 
-*All valid `[NYT bestsellers list]` values can printed to sysout by passing the Type `get-NYT-bestesller-list-names`.
+*All valid `[NYT bestsellers list]` values can printed to sysout by passing the type argument `get-NYT-bestesller-list-names`.
 
 
 
