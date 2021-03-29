@@ -16,13 +16,6 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Database
---
-DROP DATABASE IF EXISTS  goodreads_data;
-CREATE DATABASE goodreads_data;
-USE goodreads_data;
-
---
 -- Table structure for table `authors`
 --
 
@@ -218,7 +211,7 @@ CREATE TABLE `nyt_bestseller_lists` (
   `list_name_encoded` varchar(250) DEFAULT NULL,
   `date` varchar(10) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=61 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -232,10 +225,10 @@ CREATE TABLE `openlibrary_book` (
   `id` int NOT NULL AUTO_INCREMENT,
   `openlibrary_id` varchar(50) DEFAULT NULL,
   `title` varchar(250) DEFAULT NULL,
-  `author` varchar(50) DEFAULT NULL,
+  `author` varchar(250) DEFAULT NULL,
   `edition_count` int DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=101 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -309,7 +302,7 @@ CREATE TABLE `openlibrary_languages` (
   `id` int NOT NULL AUTO_INCREMENT,
   `language` varchar(10) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=43 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -340,7 +333,7 @@ CREATE TABLE `openlibrary_publish_years` (
   `id` int NOT NULL AUTO_INCREMENT,
   `year` int DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=151 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -435,4 +428,4 @@ CREATE TABLE `update_list_mapping` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-03-28 17:50:30
+-- Dump completed on 2021-03-29 13:00:40

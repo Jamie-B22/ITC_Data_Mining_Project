@@ -48,7 +48,7 @@ class NYTimesBookList:
 
     Author: Jamie Bamforth
     """
-    def __init__(self, list_name_encoded, date, api_key):  # TODO: raise API key or date errors
+    def __init__(self, list_name_encoded, date, api_key):
         """Takes a list name and a date it was published on (accepts YYYY-MM-DD or "current") and creates a
         NYTimesBookList instance. Possible list name values can be found using static method
         NYTimesBooks.get_list_names_encoded()"""
@@ -58,7 +58,8 @@ class NYTimesBookList:
         self.date = raw_list['bestsellers_date']
         self.list = raw_list['books']
 
-    def _get_list_json(self, list_name, date, api_key):
+    @staticmethod
+    def _get_list_json(list_name, date, api_key):
         """Takes the arguments fed into the initiation of the object and returns the 'results' key from the json
         returned by the API GET request."""
         date = '/' + date
