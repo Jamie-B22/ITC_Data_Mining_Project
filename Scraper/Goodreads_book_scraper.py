@@ -195,9 +195,9 @@ def get_isbn(book_page_soup):
     """Takes the HTML Beautiful Soup object of a Goodreads book page and returns the isbn as a string."""
     elem = book_page_soup.find('meta', {'property': 'books:isbn'})
     if elem is None:
-        return None
+        return 'NULL'
     elif elem['content'] == 'null':
-        return None
+        return 'NULL'
     else:
         return elem['content']
 
