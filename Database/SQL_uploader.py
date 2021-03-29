@@ -7,14 +7,12 @@ Author: Jamie Bamforth
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import exc
 import logging
-from Database.SQL_classes_tables import Author, Series, Genre, Description, Edition, List, BookUpdate,\
+from Database.SQL_classes_tables import Author, Series, Genre, Description, Edition, List, BookUpdate, \
     NYTBestsellerList, NYTBestsellerISBN, OpenLibraryBook, PublishYear, OLISBN, Language, GoodreadsID
-
 
 """Setup Logger"""
 logger = logging.getLogger('main')
 logger.setLevel(logging.DEBUG)
-
 
 
 # all get functions are intended to check if the object already exists in the database, returning the existing object if
@@ -103,6 +101,7 @@ def get_isbn13(isbn13, session):
         isbn = qry[0]
     return isbn
 
+
 def get_edition_from_isbn(isbn, session):
     """Checks if the edition associated with the isbn exists in the db already. If exists, returns that Edition
      object, if not returns None"""
@@ -119,10 +118,10 @@ def get_NYT_list(book_list, session):
     qry = session.query(NYTBestsellerList).filter(NYTBestsellerList.list_name_encoded == book_list.list_name_encoded,
                                                   NYTBestsellerList.date == book_list.date).all()
     if len(qry) == 0:
-        list = NYTBestsellerList(book_list)
+        lst = NYTBestsellerList(book_list)
     else:
-        list = qry[0]
-    return list
+        lst = qry[0]
+    return lst
 
 
 def ensure_set(obj):
@@ -174,6 +173,7 @@ def list_and_relationships_creator_and_adder(list_url, list_type, list_details, 
     session.add(book_list)
     return book_list
 
+
 def isbn_relationships_creator_and_adder(isbn, session):
     """Creates or fetches existing NYT isbn instance and creates relationship with the edition. Then adds these to the
     database."""
@@ -184,12 +184,14 @@ def isbn_relationships_creator_and_adder(isbn, session):
     session.add(isbn_instance)
     return isbn_instance
 
+
 def NYT_list_relationships_creater_and_adder(isbn_instances, book_list, session):
     """Creates or fetches existing NYT bestsellers list instance and creates relationship with the isbns on the list.
     Then adds these to the database."""
-    NYT_list = get_NYT_list(book_list, session)
-    NYT_list.nyt_bestseller_isbns += isbn_instances
-    session.add(NYT_list)
+    nyt_list = get_NYT_list(book_list, session)
+    nyt_list.nyt_bestseller_isbns += isbn_instances
+    session.add(nyt_list)
+
 
 def initialise_session(engine):
     """Intitalise SQLAlchemy engine and session to allow uploading of records to the db. Returns the sessionmaker().
@@ -243,15 +245,16 @@ def NYT_API_update_db(book_list, engine):
 
 # ############# Open Library Books ###############
 
-def get_OpenLibraryBook(OL_book, session):
+def get_OpenLibraryBook(ol_book, session):
     """Checks if the OpenLibraryBook associated with the open library id exists in the db already. If exists, returns
     that OpenLibraryBook object, if not creates and returns a new one."""
-    qry = session.query(OpenLibraryBook).filter(OpenLibraryBook.openlibrary_id == OL_book.Openlibrary_id).all()
+    qry = session.query(OpenLibraryBook).filter(OpenLibraryBook.openlibrary_id == ol_book.Openlibrary_id).all()
     if len(qry) == 0:
-        book = OpenLibraryBook(OL_book)
+        book = OpenLibraryBook(ol_book)
     else:
         book = qry[0]
     return book
+
 
 def get_publishyear(year, session):
     """Checks if the year exists in the db already. If exists, returns that PublishYear object, if not creates and
@@ -306,10 +309,10 @@ def get_goodreads_id(goodreads_id, session):
     GoodreadsID object, if not creates and returns a new one."""
     qry = session.query(GoodreadsID).filter(GoodreadsID.goodreads_id == goodreads_id).all()
     if len(qry) == 0:
-        id = GoodreadsID(goodreads_id)
+        gr_id = GoodreadsID(goodreads_id)
     else:
-        id = qry[0]
-    return id
+        gr_id = qry[0]
+    return gr_id
 
 
 def get_goodreads_id_collection(goodreads_ids, session):
@@ -317,43 +320,41 @@ def get_goodreads_id_collection(goodreads_ids, session):
     return [get_goodreads_id(goodreads_id, session) for goodreads_id in set(goodreads_ids)]
 
 
-def OLbook_and_relationships_creator_and_adder(OL_book, session):
+def OLbook_and_relationships_creator_and_adder(ol_book, session):
     """Takes an OpenLibraryBookInstance and uses its parameters and methods to provide the data required to build the
     objectis and relationships for the Open Library part of the database. adds these objects and their connections to
     the database when finished after creation."""
-    book = get_OpenLibraryBook(OL_book, session)
-    if OL_book.Publish_years is not None:
-        publishyear_collection = get_publishyear_collection(OL_book.Publish_years, session)
+    book = get_OpenLibraryBook(ol_book, session)
+    if ol_book.Publish_years is not None:
+        publishyear_collection = get_publishyear_collection(ol_book.Publish_years, session)
         book.publish_years += publishyear_collection
-    if OL_book.ISBN is not None:
-        isbn_collection = get_olisbn_collection(OL_book.ISBN, session)
+    if ol_book.ISBN is not None:
+        isbn_collection = get_olisbn_collection(ol_book.ISBN, session)
         book.isbns += isbn_collection
-    if OL_book.Languages is not None:
-        language_collection = get_language_collection(OL_book.Languages, session)
+    if ol_book.Languages is not None:
+        language_collection = get_language_collection(ol_book.Languages, session)
         book.languages += language_collection
-    if OL_book.ID_goodreads is not None:
-        goodreads_id_collection = get_goodreads_id_collection(OL_book.ID_goodreads, session)
+    if ol_book.ID_goodreads is not None:
+        goodreads_id_collection = get_goodreads_id_collection(ol_book.ID_goodreads, session)
         book.goodreads_ids += goodreads_id_collection
     # TODO: link to goodreads
     session.add(book)
 
 
-
-def OL_book_create_and_commit_data(OL_book, session):
+def OL_book_create_and_commit_data(ol_book, session):
     """Creates, adds and commits objects and relationships in Open Library part of database with the data in OL_book, an
     OpenLibraryBookInstance"""
-    OLbook_and_relationships_creator_and_adder(OL_book, session)
+    OLbook_and_relationships_creator_and_adder(ol_book, session)
     session.commit()
-    logger.info(f'Open Library book "{OL_book.Title}" committed to database.')
+    logger.info(f'Open Library book "{ol_book.Title}" committed to database.')
 
 
-
-def OL_API_update_db(OL_book, engine):
+def OL_API_update_db(ol_book, engine):
     """Updates Open Library part of database with open library book data retrieved from the API stored in OL_book, an
     OpenLibraryBookInstance"""
-    logger.info(f'Attempting to upload Open Library book "{OL_book.Title}" to database.')
+    logger.info(f'Attempting to upload Open Library book "{ol_book.Title}" to database.')
     session = initialise_session(engine)
-    OL_book_create_and_commit_data(OL_book, session)
+    OL_book_create_and_commit_data(ol_book, session)
     session.close()
     logger.debug(f'Database connection session closed.')
 

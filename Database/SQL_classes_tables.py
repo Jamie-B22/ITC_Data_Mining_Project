@@ -4,14 +4,12 @@ SQLAlchemy classes and tables for defining database and enabling upload to the d
 Author: Jamie Bamforth
 """
 
-
 from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, DECIMAL, Table
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy import exc
 import stdiomask
 import logging
-
 
 """Setup connection to database."""
 USER = input('MySQL Username:')
@@ -20,11 +18,9 @@ PASSWORD = stdiomask.getpass('MySQL Password:', mask='*')
 SQL_LANGUAGE_CONNECTION = f'mysql://{USER}:{PASSWORD}@localhost/goodreads_data'
 Base = declarative_base()
 
-
 """Setup Logger"""
 logger = logging.getLogger('main')
 logger.setLevel(logging.DEBUG)
-
 
 
 def initialise_engine_and_base():
@@ -46,6 +42,7 @@ def initialise_engine_and_base():
         else:
             logger.error(f'{engine_err}. Unable to create database engine, data will be stored in backup csv.')
             return None
+
 
 # Define mappings
 edition_author_mapping = Table(
@@ -91,7 +88,6 @@ update_edition_mapping = Table(
     Column("book_update_id", Integer, ForeignKey("book_updates.id")),
     Column("edition_id", Integer, ForeignKey("editions.id"))
 )
-
 
 nyt_bestseller_isbn_list_mapping = Table(
     "nyt_bestseller_isbn_list_mapping",
@@ -221,7 +217,8 @@ class Description(Base):
     """
     __tablename__ = 'descriptions'
     id = Column('id', Integer, primary_key=True)
-    description = Column('description', String(10000))  # TODO: deal with error string is too long (truncate str[:10000])
+    description = Column('description',
+                         String(10000))  # TODO: deal with error string is too long (truncate str[:10000])
     book_updates = relationship('BookUpdate', secondary=update_description_mapping)
 
     def __init__(self, description):
@@ -304,7 +301,6 @@ class Edition(Base):
     nyt_bestsellers_isbns = relationship('NYTBestsellerISBN', back_populates='editions')
     ol_goodreads_id = relationship('GoodreadsID', back_populates='editions')
 
-
     def __init__(self, book_record_instance):
         self.goodreads_id = book_record_instance.Book_ID
         self.isbn = book_record_instance.ISBN
@@ -363,9 +359,9 @@ class NYTBestsellerList(Base):
 
     nyt_bestseller_isbns = relationship('NYTBestsellerISBN', secondary=nyt_bestseller_isbn_list_mapping)
 
-    def __init__(self, NYTimesBookList):
-        self.list_name_encoded = NYTimesBookList.list_name_encoded
-        self.date = NYTimesBookList.date
+    def __init__(self, nytimesbooklist):
+        self.list_name_encoded = nytimesbooklist.list_name_encoded
+        self.date = nytimesbooklist.date
 
     def __str__(self):
         return str(self.__dict__.values())
@@ -380,14 +376,12 @@ openlibrary_publish_years_mapping = Table(
     Column("publish_year_id", Integer, ForeignKey("openlibrary_publish_years.id"))
 )
 
-
 openlibrary_isbn_mapping = Table(
     "openlibrary_isbn_mapping",
     Base.metadata,
     Column("open_library_book_id", Integer, ForeignKey("openlibrary_book.id")),
     Column("isbn", String(13), ForeignKey("openlibrary_isbn.isbn"))
 )
-
 
 openlibrary_languages_mapping = Table(
     "openlibrary_languages_mapping",
@@ -402,11 +396,6 @@ openlibrary_goodreads_mapping = Table(
     Column("open_library_book_id", Integer, ForeignKey("openlibrary_book.id")),
     Column("goodreads_id", String(250), ForeignKey("openlibrary_goodreads.goodreads_id"))
 )
-
-
-
-
-
 
 
 class OpenLibraryBook(Base):
@@ -444,15 +433,14 @@ class OpenLibraryBook(Base):
         self.author = book_record_instance.Author
         self.edition_count = book_record_instance.Edition_count
 
-
     def __str__(self):
         return str(self.__dict__.values())
 
 
-
 class PublishYear(Base):
     """Class inheriting from declarative_base() instance Base that allows instances to be created to store the unique
-    publish years. Instance is initiated with below parameters taken directly from a OpenLibraryBookInstance class instance.
+    publish years. Instance is initiated with below parameters taken directly from a OpenLibraryBookInstance class
+    instance.
     id is created sequentially as primary key.
     Parameters:
         id : int - primary key in database table
@@ -486,7 +474,6 @@ class OLISBN(Base):
 
     OLbook = relationship('OpenLibraryBook', secondary=openlibrary_isbn_mapping)
 
-
     def __init__(self, isbn):
         self.isbn = isbn
 
@@ -514,7 +501,8 @@ class Language(Base):
 
 class GoodreadsID(Base):
     """Class inheriting from declarative_base() instance Base that allows instances to be created to store the unique
-    GoodRead IDs. Instance is initiated with below parameters taken directly from a OpenLibraryBookInstance class instance.
+    GoodRead IDs. Instance is initiated with below parameters taken directly from a OpenLibraryBookInstance class
+    instance.
     id is created sequentially as primary key.
     Parameters:
         goodreads_id : string   (Primary Key)
@@ -541,6 +529,7 @@ def create_tables():
     session_maker = sessionmaker(bind=engine)
     session = session_maker()
     session.close()
+
 
 if __name__ == '__main__':
     create_tables()

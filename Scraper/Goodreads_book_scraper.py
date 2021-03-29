@@ -32,7 +32,6 @@ logger = logging.getLogger('main')
 logger.setLevel(logging.DEBUG)
 
 
-
 def date_from_text(date_text):
     """Takes a string with the components of the date existing somewhere in the string and returns the date string in
     format YYYY-MM-DD. Date components in date_text will be in format:
@@ -192,7 +191,7 @@ def get_genre(book_page_soup):
     return genres
 
 
-def get_isbn(book_page_soup): # TODO: if missing can get from <script> in html
+def get_isbn(book_page_soup):
     """Takes the HTML Beautiful Soup object of a Goodreads book page and returns the isbn as a string."""
     elem = book_page_soup.find('meta', {'property': 'books:isbn'})
     if elem is None:
@@ -338,5 +337,3 @@ def book_scraper_tests():
 
 if __name__ == '__main__':
     book_scraper_tests()
-
-

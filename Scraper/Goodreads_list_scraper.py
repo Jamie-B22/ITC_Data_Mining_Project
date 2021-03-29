@@ -63,8 +63,8 @@ def list_parser(list_url):
         # set used as this occurs twice for each book ID and need to remove duplicates.
         book_id_list = list({title['href'].split('/')[-1].split('.')[0].split('-')[0] for title in titles})
 
-    elif "goodreads.com/book/" in list_url or "goodreads.com/list/" in list_url:  # most read and most popular list start
-        # with this URL
+    # most read and most popular list start with this URL
+    elif "goodreads.com/book/" in list_url or "goodreads.com/list/" in list_url:
         titles = list_page_soup.find_all("a", {"class": "bookTitle"})
         # book ID may be followed by either . or -
         book_id_list = [title['href'].split('/')[-1].split('.')[0].split('-')[0] for title in titles]
@@ -104,6 +104,7 @@ def list_scraper_tests():
     print(x)
     print(len(x))
     print(type(x[0]))
+
 
 if __name__ == '__main__':
     list_scraper_tests()

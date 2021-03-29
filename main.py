@@ -34,5 +34,6 @@ def main():
     time_taken = round(time.time() - start_time, 2)
     logger.info(f'Took {time_taken}s to run program')
 
+
 if __name__ == '__main__':
     main()
