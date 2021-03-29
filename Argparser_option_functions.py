@@ -1,7 +1,7 @@
 """
 Functions to implement the functionality for each option the user can give to the argparser
 
-Author: Jamie Bamforth
+Author: Jamie Bamforth and Jordan Ribbans
 """
 
 from config import *
