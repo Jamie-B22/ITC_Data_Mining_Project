@@ -1,7 +1,6 @@
 import requests
 import json
-
-BASE_URL = "https://openlibrary.org/search.json?"
+from config import OL_BASE_URL as BASE_URL
 
 
 def open_library_docs_info(dictionary):
