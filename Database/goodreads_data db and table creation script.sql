@@ -16,6 +16,14 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Database `goodreads_data`
+--
+
+DROP DATABASE IF EXISTS goodreads_data;
+CREATE DATABASE goodreads_data;
+USE goodreads_data;
+
+--
 -- Table structure for table `authors`
 --
 
