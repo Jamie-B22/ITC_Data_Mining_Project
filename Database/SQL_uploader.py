@@ -94,6 +94,8 @@ def get_book_list(list_url, list_type, list_details, session):
 def get_isbn13(isbn13, session):
     """Checks if the isbn associated with isbn13 exists in the db already. If exists, returns that NYTBestsellerISBN
      object, if not creates and returns a new one."""
+    if isbn13 is None:
+        isbn13 = 'NULL'  # this is because 'NULL' is the value we need to query for to see if it exists, not None.
     qry = session.query(NYTBestsellerISBN).filter(NYTBestsellerISBN.isbn == isbn13).all()
     if len(qry) == 0:
         isbn = NYTBestsellerISBN(isbn13)
