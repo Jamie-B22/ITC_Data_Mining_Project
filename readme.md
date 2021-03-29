@@ -24,7 +24,7 @@ Parameters:
 | `new-releases` | `[genre]` | `new-releases fantasy` |
 | `custom-list` | `[customID]` | `custom-list 121572` |
 | `NYT-API-update-all` | `[YYYY-MM-DD or 'current']` | `NYT-API-update-all 20200122` |
-| `NYT-API-update-all` | `"[NYT bestsellers list],[YYYY-MM-DD or 'current']"`* | `NYT-API-update-list combined-print-and-e-book-fiction,current` |
+| `NYT-API-update-list` | `"[NYT bestsellers list],[YYYY-MM-DD or 'current']"`* | `NYT-API-update-list combined-print-and-e-book-fiction,current` |
 | `get-NYT-bestesller-list-names` | *leave blank* | `get-NYT-bestesller-list-names`  |
 
 *All valid `[NYT bestsellers list]` values can printed to sysout by passing the Type `get-NYT-bestesller-list-names`.
