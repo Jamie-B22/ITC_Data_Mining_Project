@@ -37,7 +37,7 @@ Parameters:
 `python3 main.py most-popular 202001`
 
 #### Points to note:
-* To avoid throttling by goodreads, there is a 10 second wait implemented between web requests.  
+* To avoid throttling by goodreads and the NYT bestseller API, there is a 10 second wait implemented between web requests.  
 * The custom lists are made by users, you need to know which list you want to scrape and get the ID from the URL.
 
 ### Database Design

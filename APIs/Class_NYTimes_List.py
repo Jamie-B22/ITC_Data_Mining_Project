@@ -48,27 +48,29 @@ class NYTimesBookList:
 
     Author: Jamie Bamforth
     """
-    def __init__(self, list_name_encoded, date, API_key):  # TODO: raise API key or date errors
+    def __init__(self, list_name_encoded, date, api_key):  # TODO: raise API key or date errors
         """Takes a list name and a date it was published on (accepts YYYY-MM-DD or "current") and creates a
         NYTimesBookList instance. Possible list name values can be found using static method
         NYTimesBooks.get_list_names_encoded()"""
-        if list_name_encoded in self.get_list_names_encoded(API_key):
-            raw_list = self._get_list_json(list_name_encoded, date, API_key)
-            self.list_name = raw_list['list_name']
-            self.list_name_encoded = raw_list['list_name_encoded']
-            self.date = raw_list['bestsellers_date']
-            self.list = raw_list['books']
-        else:
-            raise ValueError(
-                f'Encoded list name given ({list_name_encoded}) does not exist in the NYT bestsellers list options.')
+        raw_list = self._get_list_json(list_name_encoded, date, api_key)
+        self.list_name = raw_list['list_name']
+        self.list_name_encoded = raw_list['list_name_encoded']
+        self.date = raw_list['bestsellers_date']
+        self.list = raw_list['books']
 
-    def _get_list_json(self, list_name, date, API_key):
+    def _get_list_json(self, list_name, date, api_key):
         """Takes the arguments fed into the initiation of the object and returns the 'results' key from the json
         returned by the API GET request."""
         date = '/' + date
         list_name = '/' + list_name
-        url = NYT_API_BASE_URL + date + list_name + NYT_API_END_URL + API_key
-        return json.loads(requests.get(url).text)['results']
+        url = NYT_API_BASE_URL + date + list_name + NYT_API_END_URL + api_key
+        result = json.loads(requests.get(url).text)
+        if result.get('status') == 'ERROR':
+            raise ValueError(result['errors'][0])
+        elif result.get('fault') is not None:
+            raise ValueError(f"{result['fault']['detail']['errorcode']} for NYT API.")
+        else:
+            return result['results']
 
     def get_titles(self):
         """Method to return a list of the titles of the books in the NYTimesBookList instance."""
@@ -87,17 +89,17 @@ class NYTimesBookList:
         return [book['primary_isbn13'] for book in self.list]
 
     @staticmethod
-    def get_list_names(API_key):
+    def get_list_names(api_key):
         """Static method to return a list of all the names of all the bestseller lists."""
-        url = NYT_API_BASE_URL + '/names' + NYT_API_END_URL + API_key
+        url = NYT_API_BASE_URL + '/names' + NYT_API_END_URL + api_key
         list_names = json.loads(requests.get(url).text)
         return [name['list_name'] for name in list_names['results']]
 
     @staticmethod
-    def get_list_names_encoded(API_key):
+    def get_list_names_encoded(api_key):
         """Static method to return a list of all the encoded names of all the bestseller lists. These encoded names can
         all be used as an input to instantiate a NYTimesBookList object"""
-        url = NYT_API_BASE_URL + '/names' + NYT_API_END_URL + API_key
+        url = NYT_API_BASE_URL + '/names' + NYT_API_END_URL + api_key
         list_names = json.loads(requests.get(url).text)
         return [name['list_name_encoded'] for name in list_names['results']]
 
@@ -107,16 +109,18 @@ class NYTimesBookList:
 
 if __name__ == '__main__':
     # some examples of outputs of static methods and class instances if this file is run standalone
-    list = NYTimesBookList.get_list_names_encoded(NYT_API_KEY)
-    print(len(list))
-    print(NYTimesBookList(list[0], 'current', NYT_API_KEY))
+    # list2 = NYTimesBookList.get_list_names_encoded(NYT_API_KEY)
+    # print(len(list))
+    # print(NYTimesBookList(list[0], 'current', NYT_API_KEY))
+    #
+    # date1 = '/current'
+    # list1 = '/hardcover-fiction'
+    # url = NYT_API_BASE_URL + date1 + list1 + NYT_API_END_URL + NYT_API_KEY
+    # lists = json.loads(requests.get(
+    #     'https://api.nytimes.com/svc/books/v3/lists/names.json?api-key=gyAYYsc5MUxhVHVQD3AFDQznc084UhQp').text)[
+    #     'results']
+    #
+    # list_names = json.dumps(lists, indent=3)
+    # print(list_names)
 
-    date = '/current'
-    list = '/hardcover-fiction'
-    url = NYT_API_BASE_URL + date + list + NYT_API_END_URL + NYT_API_KEY
-    lists = json.loads(requests.get(
-        'https://api.nytimes.com/svc/books/v3/lists/names.json?api-key=gyAYYsc5MUxhVHVQD3AFDQznc084UhQp').text)[
-        'results']
-
-    list_names = json.dumps(lists, indent=3)
-    print(list_names)
+    print(NYTimesBookList('hardcoverfiction', '202009', 'sjdgc'))
