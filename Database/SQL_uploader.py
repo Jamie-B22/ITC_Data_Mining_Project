@@ -336,14 +336,14 @@ def OL_book_create_and_commit_data(OL_book, session):
     OpenLibraryBookInstance"""
     book_and_relationships_creator_and_adder(OL_book, session)
     session.commit()
-    logger.info(f'Open Library book ISBN {OL_book.ISBN} committed to database.')
+    logger.info(f'Open Library book "{OL_book.Title}" committed to database.')
 
 
 
 def OL_API_update_db(OL_book, engine):
     """Updates Open Library part of database with open library book data retrieved from the API stored in OL_book, an
     OpenLibraryBookInstance"""
-    logger.info(f'Attempting to upload Open Library book ISBN {OL_book.ISBN} to database.')
+    logger.info(f'Attempting to upload Open Library book "{OL_book.Title}" to database.')
     session = initialise_session(engine)
     OL_book_create_and_commit_data(OL_book, session)
     session.close()
