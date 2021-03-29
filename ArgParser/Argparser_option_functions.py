@@ -24,7 +24,7 @@ def NYT_API_update_all(date):
     engine = initialise_engine_and_base()
     logger.debug('Getting NYT Bestseller encoded list names.')
     encoded_list_names = NYTimesBookList.get_list_names_encoded(NYT_API_KEY)
-
+    upload_count = 0
     for num, list_name in enumerate(encoded_list_names):
         logger.info(f'Processing list {list_name}')
         logger.debug(f'Fetching NYT Bestseller list {list_name} from API and uploading to db.')
@@ -34,12 +34,17 @@ def NYT_API_update_all(date):
             logger.info(f'First request for {list_name} from API throttled, waiting 2 minutes and trying again.')
             time.sleep(120) # if first attempt is throttled, wait 2 mins and try again
             book_list = NYTimesBookList(list_name, date, NYT_API_KEY)
-        NYT_API_update_db(book_list, engine)
-        logger.debug(f'{list_name} uploaded to db.')
+        try:
+            NYT_API_update_db(book_list, engine)
+            logger.debug(f'{list_name} uploaded to db.')
+            upload_count += 1
+        except Exception as err:
+            logger.error(f'Unable to upload {list_name} to db due to {err}.')
+
         time.sleep(ANTI_THROTTLE_DELAY_S)
         if (num+1)%9 == 0:
             time.sleep(30) # needs more wait time for some reason
-    logger.info('Success: NYT bestseller lists uploaded to database.')
+    logger.info(f'Success: {upload_count}/{len(encoded_list_names)} NYT bestseller lists uploaded to database.')
 
 
 def NYT_API_update_list(list_date_detail):
@@ -51,11 +56,14 @@ def NYT_API_update_list(list_date_detail):
     list_name, date = list_date_detail.split(',')
     logger.debug(f'Fetching NYT Bestseller list {list_date_detail} from API and uploading to db.')
     book_list = NYTimesBookList(list_name, date, NYT_API_KEY)
-    NYT_API_update_db(book_list, engine)
-    logger.info(f'Success: {list_date_detail} uploaded to db.')
+    try:
+        NYT_API_update_db(book_list, engine)
+        logger.info(f'Success: {list_date_detail} uploaded to db.')
+    except Exception as err:
+        logger.error(f'Unable to upload {list_date_detail} to db due to {err}.')
 
 
-def NYT_bestesller_list_names(blank_option_arg_placeholder = None):
+def NYT_bestesller_list_names(blank_option_arg_placeholder=None):
     """Prints to stdout the possible list names you can give to the argpaser.
     blank_option_arg_placeholder is for compatibility with the way the functions are called in main"""
     logger.debug('Getting and printing to stdout the NYT Bestseller encoded list names.')
@@ -77,7 +85,10 @@ def OL_API_update_by_author(author):
     if len(books) > 0:
         for book_dict in books:
             book = OpenLibraryBookInstance(book_dict)
-            OL_API_update_db(book, engine)
+            try:
+                OL_API_update_db(book, engine)
+            except Exception as err:
+                logger.error(f'Unable to upload {book.Title} to db due to {err}.')
     else:
         logger.info(f"No results returned for {author}")
 
@@ -94,7 +105,10 @@ def OL_API_update_by_title(title):
     if len(books) > 0:
         for book_dict in books:
             book = OpenLibraryBookInstance(book_dict)
-            OL_API_update_db(book, engine)
+            try:
+                OL_API_update_db(book, engine)
+            except Exception as err:
+                logger.error(f'Unable to upload {book.Title} to db due to {err}.')
     else:
         logger.info(f"No results returned for {title}")
 
@@ -110,7 +124,10 @@ def OL_API_update_by_isbn(isbn):
     if len(books) > 0:
         for book_dict in books:
             book = OpenLibraryBookInstance(book_dict)
-            OL_API_update_db(book, engine)
+            try:
+                OL_API_update_db(book, engine)
+            except Exception as err:
+                logger.error(f'Unable to upload {book.Title} to db due to {err}.')
     else:
         logger.info(f"No results returned for {isbn}")
 
