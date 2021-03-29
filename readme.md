@@ -6,7 +6,7 @@
 
 This web scraper finds, scrapes and stores details of books from [GoodReads](https://www.goodreads.com/). It works by taking the user's selection of a goodreads list and scraping and storing the details of all books on that list. The data will be stored in a MySQL database (structure detailed below), or into a CSV file if it is unable to make a connection to the database.
 
-The data scraped from Goodreads can be enriched with data from:
+The data scraped from GoodReads can be enriched with data from:
 * The [New York Times (NYT) Books API](https://developer.nytimes.com/docs/books-product/1/overview), which provides details of books on the current and past NYT bestseller lists.
 * The [Open Library Books API](https://openlibrary.org/dev/docs/api/books), which provides data about the various editions of titles that have been published.
 
@@ -16,7 +16,7 @@ The web scraper was created as a project as part of the Data Science Fellows Pro
 
 `python3 main.py <type argument> <detail argument>`
 
-Parameters:
+#### Parameters:
 
 
 | Type | Detail | Example |
@@ -37,14 +37,32 @@ Parameters:
 *All valid `[NYT bestsellers list]` values can printed to sysout by passing the type argument `get-NYT-bestesller-list-names`.
 
 
-
-
 #### Example:
 
 `python3 main.py most-popular 202001`
 
+
+#### Parameter descriptions:
+
+| Type | Description |
+| :--- | :----------- |
+| **Scraping** |
+| `most-popular` | Scrapes the most popular books on GoodReads in a given month |
+| `most-read` | Scrapes the most read books on GoodReads for a given country in the latest week/month/year |
+| `new-releases` | Scrapes GoodReads for the latest releases for a given genre |
+| `custom-list` | Scrapes books from custom lists created by GoodReads users |
+| **Enrichment** |
+| `NYT-API-update-all` | Fetches every NYT bestseller list for the given date |
+| `NYT-API-update-list` | Fetches the given NYT bestseller list for that date |
+| `get-NYT-bestesller-list-names` | Prints the possible list names you can give above |
+| `OL-title-search` | Searches OpenLibrary for all books with the given title (or similar) |
+| `OL-author-search` | Searches OpenLibrary for all books with the given author (or similar)|
+| `OL-ISBN-search` | Searches OpenLibrary for the book with the given ISBN |
+
+
+
 #### Points to note:
-* To avoid throttling by goodreads and the NYT bestseller API, there is a 10 second wait implemented between web requests.  
+* To avoid throttling by GoodReads and the NYT bestseller API, there is a 10 second wait implemented between web requests.  
 * The custom lists are made by users, you need to know which list you want to scrape and get the ID from the URL.
 * Only run 'main.py' from the terminal, not from a python console. Due to the use of the package 'stdiomask' to mask the SQL user password entered in the command line, any modules that import the 'SQL_classes_tables.py' will not run from the python console and should only be run from the terminal. 
 
@@ -52,7 +70,7 @@ Parameters:
 
 <img src="https://raw.githubusercontent.com/Jamie-B22/ITC_Data_Mining_Project/master/Reference%20Material/ERD.png" width="1000">
 
-**Note:** The openlibrary_isbn table is not connected via isbn to the editions tables in the schema, but the database is designed so that they can be joined in queries
+**Note:** The `openlibrary_isbn` table is not connected via isbn to the editions tables in the schema, but the database is designed so that they can be joined in queries
 
 Details about the database structure can be found in the file: [data_dictionary](https://github.com/Jamie-B22/ITC_Data_Mining_Project/blob/master/Reference%20Material/data_dictionary.csv)
 
