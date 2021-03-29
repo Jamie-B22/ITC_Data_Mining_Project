@@ -222,8 +222,7 @@ class Description(Base):
     """
     __tablename__ = 'descriptions'
     id = Column('id', Integer, primary_key=True)
-    description = Column('description',
-                         String(10000))  # TODO: deal with error string is too long (truncate str[:10000])
+    description = Column('description', String(10000))
     book_updates = relationship('BookUpdate', secondary=update_description_mapping)
 
     def __init__(self, description):

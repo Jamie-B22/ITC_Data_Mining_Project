@@ -43,4 +43,4 @@ class BookRecord:
         self.Qty_pages = data_dict['Qty_pages']
         self.Genres = data_dict['Genres']
         self.Scrape_datetime = data_dict['Scrape_datetime']
-        self.Description = data_dict['Description']
+        self.Description = data_dict['Description'][:10000]

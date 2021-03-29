@@ -39,6 +39,7 @@ Parameters:
 #### Points to note:
 * To avoid throttling by goodreads and the NYT bestseller API, there is a 10 second wait implemented between web requests.  
 * The custom lists are made by users, you need to know which list you want to scrape and get the ID from the URL.
+* Only run 'main.py' from the terminal, not from a python console. Due to the use of the package 'stdiomask' to mask the SQL user password entered in the command line, any modules that import the 'SQL_classes_tables.py' will not run from the python console and should only be run from the terminal. 
 
 ### Database Design
 

@@ -140,7 +140,6 @@ def book_and_relationships_creator_and_adder(book_record_instance, session):
     """Takes book_record_instance and uses its parameters to create a new or update an existing Edition, BookUpdate,
     Author, Series, Genre and Descrition objects. It then adds the relevant relationships btween objects adding the
     relationships to the BookUpdate (book_updates) objects. Returns the BookUpdate instance."""
-    # TODO: split into instance creator and relationships creator?
     record = BookUpdate(book_record_instance)
     edition = get_edition(book_record_instance, session)
     record.edition = [edition]
@@ -153,9 +152,6 @@ def book_and_relationships_creator_and_adder(book_record_instance, session):
     genres_collection = get_genre_collection(book_record_instance.Genres, session)
     edition.genres = genres_collection
     description = get_description(book_record_instance.Description, session)
-    # TODO: log if this was successful and add a debug level with issues.
-    # TODO: put somewhere that description only exists as a separate table is to save memory,
-    #  each description is associated with multiple book title pulls.
     record.description = [description]
     goodreads_id = get_goodreads_id(book_record_instance.Book_ID, session)
     edition.ol_goodreads_id = goodreads_id
@@ -337,7 +333,6 @@ def OLbook_and_relationships_creator_and_adder(ol_book, session):
     if ol_book.ID_goodreads is not None:
         goodreads_id_collection = get_goodreads_id_collection(ol_book.ID_goodreads, session)
         book.goodreads_ids += goodreads_id_collection
-    # TODO: link to goodreads
     session.add(book)
 
 
