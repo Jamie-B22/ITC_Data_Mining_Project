@@ -15,6 +15,8 @@ OUTPUT_FILE_NAME = "scrape_data.csv"
 # Constant url root to which the unique Goodreads ID of a book is appended to access the Goodreads page for that book
 ROOT_BOOK_URL = "http://www.goodreads.com/book/show/"
 
+# For OL API
+OL_BASE_URL = "https://openlibrary.org/search.json?"
 
 # For the NYT API
 NYT_API_KEY = 'gyAYYsc5MUxhVHVQD3AFDQznc084UhQp'
