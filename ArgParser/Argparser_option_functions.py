@@ -17,13 +17,11 @@ logger = logging.getLogger('main')
 logger.setLevel(logging.DEBUG)
 
 
-
-
 def NYT_API_update_all(date):
     """Takes a date (accepts string format "YYYY-MM-DD" or "current") and fetches every NYT bestseller list for that
     date and uploads them to the database."""
     logger.debug('Initialising engine.')
-    engine = initialise_engine_and_base() #TODO: this is currently created in main. Create in main and pass here, or create here?
+    engine = initialise_engine_and_base()
     logger.debug('Getting NYT Bestseller encoded list names.')
     encoded_list_names = NYTimesBookList.get_list_names_encoded(NYT_API_KEY)
 
@@ -76,9 +74,13 @@ def OL_API_update_by_author(author):
     engine = initialise_engine_and_base()
     logger.debug('Getting OpenLibrary books by Author')
     books = author_search(author)
-    for book_dict in books:
-        book = OpenLibraryBookInstance(book_dict)
-        OL_API_update_db(book, engine)
+    if len(books) > 0:
+        for book_dict in books:
+            book = OpenLibraryBookInstance(book_dict)
+            OL_API_update_db(book, engine)
+    else:
+        logger.info(f"No results returned for {author}")
+
 
 
 def OL_API_update_by_title(title):
@@ -89,9 +91,12 @@ def OL_API_update_by_title(title):
     engine = initialise_engine_and_base()
     logger.debug('Getting OpenLibrary books by Title')
     books = title_search(title)
-    for book_dict in books:
-        book = OpenLibraryBookInstance(book_dict)
-        OL_API_update_db(book, engine)
+    if len(books) > 0:
+        for book_dict in books:
+            book = OpenLibraryBookInstance(book_dict)
+            OL_API_update_db(book, engine)
+    else:
+        logger.info(f"No results returned for {title}")
 
 
 def OL_API_update_by_isbn(isbn):
@@ -102,9 +107,12 @@ def OL_API_update_by_isbn(isbn):
     engine = initialise_engine_and_base()
     logger.debug('Getting OpenLibrary books by ISBN')
     books = isbn_search(isbn)
-    for book_dict in books:
-        book = OpenLibraryBookInstance(book_dict)
-        OL_API_update_db(book, engine)
+    if len(books) > 0:
+        for book_dict in books:
+            book = OpenLibraryBookInstance(book_dict)
+            OL_API_update_db(book, engine)
+    else:
+        logger.info(f"No results returned for {isbn}")
 
 
 
