@@ -28,7 +28,7 @@ The web scraper was created as a project as part of the Data Science Fellows Pro
 | `custom-list` | `[customID]` | `custom-list 121572` |
 | **Enrichment** |
 | `NYT-API-update-all` | `[YYYY-MM-DD or 'current']` | `NYT-API-update-all 20200122` |
-| `NYT-API-update-list` | `"[NYT bestsellers list],[YYYY-MM-DD or 'current']"`* | `NYT-API-update-list combined-print-and-e-book-fiction,current` |
+| `NYT-API-update-list` | `"[NYT bestsellers list],[YYYY-MM-DD or 'current']"`* | `NYT-API-update-list hardcover-fiction,current` |
 | `get-NYT-bestesller-list-names` | *leave blank* | `get-NYT-bestesller-list-names`  |
 | `OL-title-search` | `[book title]` | `OL-title-search Harry Potter` |
 | `OL-author-search` | `[author name]` | `OL-author-search J K Rowling` |

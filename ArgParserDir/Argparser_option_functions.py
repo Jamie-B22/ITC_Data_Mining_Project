@@ -34,12 +34,17 @@ def NYT_API_update_all(date):
             logger.info(f'First request for {list_name} from API throttled, waiting 2 minutes and trying again.')
             time.sleep(120)  # if first attempt is throttled, wait 2 mins and try again
             book_list = NYTimesBookList(list_name, date, NYT_API_KEY)
-        try:
-            NYT_API_update_db(book_list, engine)
-            logger.debug(f'{list_name} uploaded to db.')
-            upload_count += 1
         except Exception as err:
-            logger.error(f'Unable to upload {list_name} to db due to {err}.')
+            book_list = None
+            logger.error(f'Unable to retrieve {list_name} from API: {err}.')
+
+        if book_list is not None:
+            try:
+                NYT_API_update_db(book_list, engine)
+                logger.debug(f'{list_name} uploaded to db.')
+                upload_count += 1
+            except Exception as err:
+                logger.error(f'Unable to upload {list_name} to db due to {err}.')
 
         time.sleep(ANTI_THROTTLE_DELAY_S)
         if (num+1) % 9 == 0:
@@ -55,8 +60,8 @@ def NYT_API_update_list(list_date_detail):
     logger.debug('Getting NYT Bestseller list from API.')
     list_name, date = list_date_detail.split(',')
     logger.debug(f'Fetching NYT Bestseller list {list_date_detail} from API and uploading to db.')
-    book_list = NYTimesBookList(list_name, date, NYT_API_KEY)
     try:
+        book_list = NYTimesBookList(list_name, date, NYT_API_KEY)
         NYT_API_update_db(book_list, engine)
         logger.info(f'Success: {list_date_detail} uploaded to db.')
     except Exception as err:
