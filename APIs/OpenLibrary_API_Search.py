@@ -4,6 +4,10 @@ from config import OL_BASE_URL as BASE_URL
 
 
 def open_library_docs_info(dictionary):
+    """
+    Takes a dictionary (from OpenLibrary's JSON API) and returns a list with a dictionary of important features
+    for each book
+    """
     book_results = []
     for i in range(len(dictionary["docs"])):
         book_data = {key: value for key, value in dictionary["docs"][i].items()
@@ -14,6 +18,9 @@ def open_library_docs_info(dictionary):
 
 
 def author_search(author):
+    """
+    Takes a string as a query for a author and returns a list of dictionaries for all books that match the query
+    """
     query = "author=" + author
     response = requests.get(BASE_URL + query)
     ol_dict = json.loads(response.text)
@@ -21,6 +28,9 @@ def author_search(author):
 
 
 def isbn_search(isbn):
+    """
+    Takes a string as a query for an ISBN and returns a list of dictionaries for all books that match the query
+    """
     query = "isbn=" + isbn
     response = requests.get(BASE_URL + query)
     ol_dict = json.loads(response.text)
@@ -28,6 +38,9 @@ def isbn_search(isbn):
 
 
 def title_search(title):
+    """
+    Takes a string as a query for a book title and returns a list of dictionaries for all books that match the query
+    """
     query = "title=" + title
     response = requests.get(BASE_URL + query)
     ol_dict = json.loads(response.text)
@@ -35,6 +48,9 @@ def title_search(title):
 
 
 def all_search(search):
+    """
+    Takes a string as a generic query and returns a list of dictionaries for all books that match the query
+    """
     query = "q=" + search
     response = requests.get(BASE_URL + query)
     ol_dict = json.loads(response.text)
@@ -48,7 +64,7 @@ class OpenLibraryBookInstance:
         Author : str
         Edition_count : int
         Publish_years : list of strings (which are all integers)
-        ISBN : list of strings (which are all integers)
+        ISBN : list of strings
         Languages : list of strings
         ID_goodreads : list of strings
 
@@ -58,9 +74,11 @@ class OpenLibraryBookInstance:
         """Instantiate a Book_Record object by passing it a dict of the data required to set it's attribute values"""
         # suffix of .encode('ascii', errors='ignore').decode('utf-8') is to fix encoding errors to UTF-8 by dropping
         # unrecognised characters
+        # Openlibrary_id, Title and Author limited to 250 characters for database
         self.Openlibrary_id = data_dict.get('key').encode('ascii', errors='ignore').decode('utf-8')[:250]
         self.Title = data_dict.get('title').encode('ascii', errors='ignore').decode('utf-8')[:250]
         if data_dict.get('author_name') is not None:
+            # returns the author name if the field is just a string, otherwise returns first element of list
             self.Author = (data_dict.get('author_name')[:250] if isinstance(data_dict.get('author_name'), str) \
             else data_dict.get('author_name')[0]).encode('ascii', errors='ignore').decode('utf-8')[:250]
         else:
