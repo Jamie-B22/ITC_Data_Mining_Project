@@ -31,8 +31,8 @@ The web scraper was created as a project as part of the Data Science Fellows Pro
 | `NYT-API-update-list` | `"[NYT bestsellers list],[YYYY-MM-DD or 'current']"`* | `NYT-API-update-list combined-print-and-e-book-fiction,current` |
 | `get-NYT-bestesller-list-names` | *leave blank* | `get-NYT-bestesller-list-names`  |
 | `OL-title-search` | `[book title]` | `OL-title-search Harry Potter` |
-| `OL-author-search` | `[author name]` | `OL-title-search J K Rowling` |
-| `OL-ISBN-search` | `[ISBN]` | `OL-title-search 059035342X` |
+| `OL-author-search` | `[author name]` | `OL-author-search J K Rowling` |
+| `OL-ISBN-search` | `[ISBN]` | `OL-ISBN-search 059035342X` |
 
 *All valid `[NYT bestsellers list]` values can printed to sysout by passing the type argument `get-NYT-bestesller-list-names`.
 
