@@ -98,11 +98,12 @@ nyt_bestseller_isbn_list_mapping = Table(
 
 
 class BookUpdate(Base):
-    """Class inheriting from dectarative_base() instance Base that allows instances to be created to store the updates
+    """Class inheriting from declarative_base() instance Base that allows instances to be created to store the updates
     to a book edition with each scrape. Instance is initiated with below parameters taken directly from a BookRecord
     class instance. id is created sequentially as primary key.
-    Parameters:
+    Key:
         id : int - primary key in database table
+    Attributes:
         rating : decimal to 2 d.p. and 3 s.f. - range 0-5 stars
         qty_ratings : int
         qty_reviews : int
@@ -135,11 +136,12 @@ class BookUpdate(Base):
 
 
 class Author(Base):
-    """Class inheriting from dectarative_base() instance Base that allows instances to be created to store the unique
+    """Class inheriting from declarative_base() instance Base that allows instances to be created to store the unique
     author names. Instance is initiated with below parameters taken directly from a BookRecord class instance.
     id is created sequentially as primary key.
-    Parameters:
+    Key:
         id : int - primary key in database table
+    Attributes:
         name : str
 
     Relationships with:
@@ -158,11 +160,12 @@ class Author(Base):
 
 
 class Series(Base):
-    """Class inheriting from dectarative_base() instance Base that allows instances to be created to store the unique
+    """Class inheriting from declarative_base() instance Base that allows instances to be created to store the unique
     series names. Instance is initiated with below parameters taken directly from a BookRecord class instance.
     id is created sequentially as primary key.
-    Parameters:
+    Key:
         id : int - primary key in database table
+    Attributes:
         name : str
 
     Relationships with:
@@ -181,11 +184,12 @@ class Series(Base):
 
 
 class Genre(Base):
-    """Class inheriting from dectarative_base() instance Base that allows instances to be created to store the unique
+    """Class inheriting from declarative_base() instance Base that allows instances to be created to store the unique
     genre names. Instance is initiated with below parameters taken directly from a BookRecord class instance.
     id is created sequentially as primary key.
-    Parameters:
+    Kwy:
         id : int - primary key in database table
+    Attributes:
         name : str
 
     Relationships with:
@@ -204,12 +208,13 @@ class Genre(Base):
 
 
 class Description(Base):
-    """Class inheriting from dectarative_base() instance Base that allows instances to be created to store the unique
+    """Class inheriting from declarative_base() instance Base that allows instances to be created to store the unique
     description strings. Separate to updates as each string is quite long and only changes occasionally, so can be
     re-used between updates. Instance is initiated with below parameters taken directly from a BookRecord class instance
     id is created sequentially as primary key.
-    Parameters:
+    Key:
         id : int - primary key in database table
+    Attributes:
         description : str
 
     Relationships with:
@@ -229,12 +234,13 @@ class Description(Base):
 
 
 class List(Base):
-    """Class inheriting from dectarative_base() instance Base that allows List instances to be created to store the
+    """Class inheriting from declarative_base() instance Base that allows List instances to be created to store the
     unique list information. Instance is initiated with url, type and detail parameters determined from the user input
     in main.py.
     id is created sequentially as primary key.
-    Parameters:
+    Key:
         id : int - primary key in database table
+    Attributes:
         type : str
         details : str
         url : str
@@ -259,11 +265,12 @@ class List(Base):
 
 
 class Edition(Base):
-    """Class inheriting from dectarative_base() instance Base that allows instances to be created to store the unique
+    """Class inheriting from declarative_base() instance Base that allows instances to be created to store the unique
     series names. Instance is initiated with below parameters taken directly from a BookRecord class instance.
     id is created sequentially as primary key.
-    Parameters:
+    Key:
         id : int - primary key in database table
+    Attributes:
         goodreads_id : str
         title : str
         format : str
@@ -316,10 +323,10 @@ class Edition(Base):
 
 
 class NYTBestsellerISBN(Base):
-    """Class inheriting from dectarative_base() instance Base that allows instances to be created to store the unique
+    """Class inheriting from declarative_base() instance Base that allows instances to be created to store the unique
         ISBNs associated with books on NYT Bestsellers Lists. Instance is initiated with below parameters taken directly
         from a NYTimesBookList class instance.
-        Parameters:
+        Attributes:
             isbn : str - alphanumeric code of length 10 or 13 (Primary Key)
 
         Relationships with:
@@ -341,11 +348,12 @@ class NYTBestsellerISBN(Base):
 
 
 class NYTBestsellerList(Base):
-    """Class inheriting from dectarative_base() instance Base that allows instances to be created to store the unique
+    """Class inheriting from declarative_base() instance Base that allows instances to be created to store the unique
         NYT Bestsellers Lists published on a certain date. Instance is initiated with below parameters taken directly
         from a NYTimesBookList class instance.
-        Parameters:
+        Key:
             id : int - primary key in database table
+        Attributes:
             list_name_encoded : str
             date : str (format YYYY-MM-DD)
 
@@ -399,11 +407,12 @@ openlibrary_goodreads_mapping = Table(
 
 
 class OpenLibraryBook(Base):
-    """Class inheriting from dectarative_base() instance Base that allows instances to be created to store the unique
+    """Class inheriting from declarative_base() instance Base that allows instances to be created to store the unique
     series names. Instance is initiated with below parameters taken directly from a BookRecord class instance.
     id is created sequentially as primary key.
-    Parameters:
+    Key:
         id : int - primary key in database table
+    Attributes:
         openlibrary_id : str
         title : str
         author : str
@@ -442,8 +451,9 @@ class PublishYear(Base):
     publish years. Instance is initiated with below parameters taken directly from a OpenLibraryBookInstance class
     instance.
     id is created sequentially as primary key.
-    Parameters:
+    Key:
         id : int - primary key in database table
+    Attributes:
         year : int
 
     Relationships with:
@@ -463,7 +473,7 @@ class OLISBN(Base):
     """Class inheriting from declarative_base() instance Base that allows instances to be created to store the unique
     ISBNs. Instance is initiated with below parameters taken directly from a OpenLibraryBookInstance class instance.
     id is created sequentially as primary key.
-    Parameters:
+    Attributes:
         isbn : str - alphanumeric code of length 10 or 13 (Primary Key)
 
     Relationships with:
@@ -482,8 +492,9 @@ class Language(Base):
     """Class inheriting from declarative_base() instance Base that allows instances to be created to store the unique
     languages. Instance is initiated with below parameters taken directly from a OpenLibraryBookInstance class instance.
     id is created sequentially as primary key.
-    Parameters:
+    Key:
         id : int - primary key in database table
+    Attributes:
         language : str
 
     Relationships with:
@@ -504,7 +515,7 @@ class GoodreadsID(Base):
     GoodRead IDs. Instance is initiated with below parameters taken directly from a OpenLibraryBookInstance class
     instance.
     id is created sequentially as primary key.
-    Parameters:
+    Attributes:
         goodreads_id : string   (Primary Key)
 
     Relationships with:
