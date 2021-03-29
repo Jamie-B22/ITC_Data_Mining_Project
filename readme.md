@@ -54,7 +54,7 @@ The web scraper was created as a project as part of the Data Science Fellows Pro
 | **Enrichment** |
 | `NYT-API-update-all` | Fetches every NYT bestseller list for the given date |
 | `NYT-API-update-list` | Fetches the given NYT bestseller list for that date |
-| `get-NYT-bestesller-list-names` | Prints the possible list names you can give above (nothing uploaded the database) |
+| `get-NYT-bestesller-list-names` | Prints the possible list names you can give above (nothing uploaded to the database) |
 | `OL-title-search` | Searches OpenLibrary for all books with the given title (or similar) |
 | `OL-author-search` | Searches OpenLibrary for all books with the given author (or similar)|
 | `OL-ISBN-search` | Searches OpenLibrary for the book with the given ISBN |
