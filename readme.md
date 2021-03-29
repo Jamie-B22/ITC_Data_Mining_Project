@@ -12,8 +12,6 @@ The web scraper was created as a project as part of the Data Science Fellows Pro
 
 `python3 main.py <type argument> <detail argument>`
 
-(Defaults to most read this week in local country if no arguments entered.)
-
 Parameters:
 
 
@@ -26,6 +24,9 @@ Parameters:
 | `NYT-API-update-all` | `[YYYY-MM-DD or 'current']` | `NYT-API-update-all 20200122` |
 | `NYT-API-update-list` | `"[NYT bestsellers list],[YYYY-MM-DD or 'current']"`* | `NYT-API-update-list combined-print-and-e-book-fiction,current` |
 | `get-NYT-bestesller-list-names` | *leave blank* | `get-NYT-bestesller-list-names`  |
+| `OL-title-search` | `[book title]` | `OL-title-search Harry Potter` |
+| `OL-author-search` | `[author name]` | `OL-title-search J K Rowling` |
+| `OL-ISBN-search` | `[ISBN]` | `OL-title-search 059035342X` |
 
 *All valid `[NYT bestsellers list]` values can printed to sysout by passing the Type `get-NYT-bestesller-list-names`.
 
@@ -43,9 +44,11 @@ Parameters:
 
 ### Database Design
 
-<img src="https://github.com/Jamie-B22/ITC_Data_Mining_Project/blob/497f7430c371978d647f9cda8f873e3f4a9a299a/Reference%20Material/ERD.png" width="1000">
+<img src="https://raw.githubusercontent.com/Jamie-B22/ITC_Data_Mining_Project/master/Reference%20Material/ERD.png" width="1000">
 
-Details about the database structure can be found in the file: [data_dictionary](https://github.com/Jamie-B22/ITC_Data_Mining_Project/blob/497f7430c371978d647f9cda8f873e3f4a9a299a/Reference%20Material/data_dictionary.xlsx)
+**Note:** The openlibrary_isbn table is not connected via isbn to the editions tables in the schema, but the database is designed so that they can be joined in queries
+
+Details about the database structure can be found in the file: [data_dictionary](https://github.com/Jamie-B22/ITC_Data_Mining_Project/blob/master/Reference%20Material/data_dictionary.csv)
 
 ### Setup Instructions
 #### Database Setup:
