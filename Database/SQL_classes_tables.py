@@ -333,7 +333,7 @@ class NYTBestsellerISBN(Base):
             NYTBestsellerList >< this class
         """
     __tablename__ = 'nyt_bestseller_isbns'
-    isbn = Column('isbn', String(13), primary_key=True)
+    isbn = Column('isbn', String(13), primary_key=True, default='NULL')
 
     # one to one relationship were the 'back_populates' argument is the relationship object defined in 'Edition' class
     editions = relationship('Edition', uselist=False, back_populates="nyt_bestsellers_isbns")
@@ -479,7 +479,7 @@ class OLISBN(Base):
         openlibrary_book >< this class
     """
     __tablename__ = 'openlibrary_isbn'
-    isbn = Column('isbn', String(13), primary_key=True)
+    isbn = Column('isbn', String(13), primary_key=True, default='NULL')
 
     OLbook = relationship('OpenLibraryBook', secondary=openlibrary_isbn_mapping)
 
