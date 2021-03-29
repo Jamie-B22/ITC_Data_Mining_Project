@@ -48,7 +48,7 @@ nyt_bestseller_isbns,Unique ISBNs from all NYT bestseller lists,isbn,varchar(13)
 openlibrary_book,Data from OpenLibrary with a row for each book,int,id,P,Unique ID created for each OpenLibrary book,
 openlibrary_book,,varchar(50),openlibrary_id,,ID from OpenLibrary API,
 openlibrary_book,,varchar(250),title,,Book title,
-openlibrary_book,,varchar(50),author,,Book author,
+openlibrary_book,,varchar(250),author,,Book author,
 openlibrary_book,,int,edition_count,,Number of versions of book,
 openlibrary_goodreads_mapping,Maps between OpenLibrary books and all their GoodReads IDs,varchar(250),goodreads_id,P (composite),ID from GoodReads website,openlibrary_goodreads.goodreads_id
 openlibrary_goodreads_mapping,,int,open_library_book_id,P (composite),Unique ID created for each OpenLibrary book,openlibrary_book.id
