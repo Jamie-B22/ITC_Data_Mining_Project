@@ -1,0 +1,66 @@
+Table,Description,Columns,Type,Key,Description,Foreign Table.Key
+lists,Contains a row for each list entered into command line,id,int,P,Unique ID created when each list entered into table,update_list_mapping.list_id
+lists,,type,varchar(250),,Type of list (first parameter),
+lists,,details,varchar(250),,Details of the list type (second parameter),
+lists,,url,varchar(250),,List URL,
+update_list_mapping,Maps between each list and the books on that list,book_update_id,int,P,Unique ID created when each book update is entered into table,book_updates.id
+update_list_mapping,,list_id,int,,Unique ID created when each list entered into table,lists.id
+book_updates,Contains information that gets updated each time a book is scraped,id,int,P,Unique ID created when each book update is entered into table,update_list_mapping.book_update_id
+book_updates,,rating,"decimal(3,2)",,Book rating,
+book_updates,,qty_ratings,int,,Number of ratings,
+book_updates,,qty_reviews,int,,Number of reviews,
+book_updates,,scrape_datetime,varchar(25),,Datetime that scraping occurred,
+update_description_mapping,Maps books with their description (to decrease the size of the book_update table),book_update_id,int,P,Unique ID created when each book update is entered into table,book_updates.id
+update_description_mapping,,description_id,int,,Unique ID for book description text,descriptions.id
+descriptions,Text for each book description,id,int,P,Unique ID for book description text,update_description_mapping.description_id
+descriptions,,description,varchar(10000),,Book description,
+update_edition_mapping,"Maps between book information that gets updated, and the fixed details",book_update_id,int,P,Unique ID created when each book update is entered into table,book_updates.id
+update_edition_mapping,,edition_id,int,,Unique ID created when each book edition is entered into table,editions.id
+editions,Contains all the fixed information about each edition of each book,id,int,P,Unique ID created when each book edition is entered into table,update_edition_mapping.edition_id
+editions,,isbn,varchar(13),,Book ISBN,nyt_bestseller_isbns.isbn
+editions,,goodreads_id,int,,GoodReads own unique ID for each book,
+editions,,title,varchar(250),,Book title,
+editions,,format,varchar(250),,"Book format (eg paperback, hardcover)",
+editions,,number_in_series,varchar(250),,The book number from its series,
+editions,,release_date,varchar(10),,Release date,
+editions,,first_published_date,varchar(10),,First published date,
+editions,,qty_pages,int,,Number of pages in book,
+edition_author_mapping,Maps between each edition and the author name,edition_id,int,P,Unique ID created when each book edition is entered into table,editions.id
+edition_author_mapping,,author_id,int,,Unique ID created for each author,authors.id
+authors,Contains author names,id,int,P,Unique ID created for each author,edition_author_mapping.author_id
+authors,,name,varchar(250),,Author name,
+edition_series_mapping,Maps between each edition and the series name,edition_id,int,P,Unique ID created when each book edition is entered into table,editions.id
+edition_series_mapping,,series_id,int,,Unique ID created for each series,series.id
+series,Contains series names,id,int,P,Unique ID created for each series,edition_series_mapping.series_id
+series,,name,varchar(250),,Series name,
+edition_genre_mapping,Maps between each edition and multiple genres,edition_id,int,P (composite),Unique ID created when each book edition is entered into table,editions.id
+edition_genre_mapping,,genre_id,int,P (composite),Unique ID created for each genre,genres.id
+genres,Contains genre names,id,int,P,Unique ID created for each genre,edition_genre_mapping.genre_id
+genres,,name,varchar(250),,Genre name,
+,,,,,,
+nyt_bestseller_lists,Contains a row for each New York Times bestseller list,id,int,P,Unique ID created when each list entered into table,nyt_bestseller_isbn_list_mapping.lists_id
+nyt_bestseller_lists,,list_name_encoded,varchar(250),,Name of the list,
+nyt_bestseller_lists,,date,varchar(10),,Date the list was created on the website,
+nyt_bestseller_isbn_list_mapping,Maps between NYT lists and the books on the list,lists_id,int,P (composite),Unique ID created when each list entered into table,nyt_bestseller_lists.id
+nyt_bestseller_isbn_list_mapping,,isbn,varchar(13),P (composite),ISBN for each book in the list,nyt_bestseller_isbns.isbn
+nyt_bestseller_isbns,Unique ISBNs from all NYT bestseller lists,isbn,varchar(13),P,ISBN for each book in all lists,editions.isbn
+,,,,,,
+openlibrary_book,Data from OpenLibrary with a row for each book,int,id,P,Unique ID created for each OpenLibrary book,
+openlibrary_book,,varchar(50),openlibrary_id,,ID from OpenLibrary API,
+openlibrary_book,,varchar(250),title,,Book title,
+openlibrary_book,,varchar(50),author,,Book author,
+openlibrary_book,,int,edition_count,,Number of versions of book,
+openlibrary_goodreads_mapping,Maps between OpenLibrary books and all their GoodReads IDs,varchar(250),goodreads_id,P (composite),ID from GoodReads website,openlibrary_goodreads.goodreads_id
+openlibrary_goodreads_mapping,,int,open_library_book_id,P (composite),Unique ID created for each OpenLibrary book,openlibrary_book.id
+openlibrary_goodreads,Contains GoodReads IDs from OpenLibrary,varchar(250),goodreads_id,P,ID from GoodReads website,openlibrary_goodreads_mapping.goodreads_id
+openlibrary_isbn_mapping,Maps between each OpenLibrary book and its ISBNs,int,open_library_book_id,P (composite),Unique ID created for each OpenLibrary book,openlibrary_book.id
+openlibrary_isbn_mapping,,varchar(13),isbn,P (composite),Book ISBN,openlibrary_isbn.isbn
+openlibrary_isbn,Contains ISBNs from OpenLibrary,varchar(13),isbn,P,Book ISBN,openlibrary_isbn_mapping.isbn
+openlibrary_publish_years_mapping,Maps between each OpenLibrary book and its publish years,int,open_library_book_id,P (composite),Unique ID created for each OpenLibrary book,openlibrary_book.id
+openlibrary_publish_years_mapping,,int,publish_year_id,P (composite),Unique ID created to map book to each publish year,openlibrary_publish_years.id
+openlibrary_publish_years,Contains publish years from OpenLibrary,int,id,P,Unique ID created to map book to each publish year,openlibrary_publish_years_mapping.publish_year_id
+openlibrary_publish_years,,int,year,,Publish year,
+openlibrary_languages_mapping,Maps between each OpenLibrary book and its printed languages,int,open_library_book_id,P (composite),Unique ID created for each OpenLibrary book,openlibrary_book.id
+openlibrary_languages_mapping,,int,language_id,P (composite),Unique ID created to map book to each language,openlibrary_languages.id
+openlibrary_languages,Contains languages from OpenLibrary,int,id,P,Unique ID created to map book to each language,openlibrary_languages_mapping.language_id
+openlibrary_languages,,varchar(10),language,,Book language,
