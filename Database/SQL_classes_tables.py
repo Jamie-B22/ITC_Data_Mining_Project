@@ -430,7 +430,7 @@ class OpenLibraryBook(Base):
     id = Column('id', Integer, primary_key=True)
     openlibrary_id = Column('openlibrary_id', String(50))
     title = Column('title', String(250))
-    author = Column('author', String(50))
+    author = Column('author', String(250))
     edition_count = Column('edition_count', Integer)
 
     publish_years = relationship('PublishYear', secondary=openlibrary_publish_years_mapping)

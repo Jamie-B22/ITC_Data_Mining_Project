@@ -56,14 +56,20 @@ class OpenLibraryBookInstance:
     """
     def __init__(self, data_dict):
         """Instantiate a Book_Record object by passing it a dict of the data required to set it's attribute values"""
-        self.Openlibrary_id = data_dict.get('key')
-        self.Title = data_dict.get('title')
-        self.Author = data_dict.get('author_name') if isinstance(data_dict.get('author_name'), str) \
-                                                    else data_dict.get('author_name')[0]
+        # suffix of .encode('ascii', errors='ignore').decode('utf-8') is to fix encoding errors to UTF-8 by dropping
+        # unrecognised characters
+        self.Openlibrary_id = data_dict.get('key').encode('ascii', errors='ignore').decode('utf-8')[:250]
+        self.Title = data_dict.get('title').encode('ascii', errors='ignore').decode('utf-8')[:250]
+        if data_dict.get('author_name') is not None:
+            self.Author = (data_dict.get('author_name')[:250] if isinstance(data_dict.get('author_name'), str) \
+            else data_dict.get('author_name')[0]).encode('ascii', errors='ignore').decode('utf-8')[:250]
+        else:
+            self.Author = None
         self.Edition_count = data_dict.get('edition_count')
         self.Publish_years = data_dict.get('publish_year')
         if data_dict.get('isbn') is not None:
-            self.ISBN = [isbn.replace('-','') for isbn in data_dict.get('isbn')]
+            self.ISBN = [isbn.replace('-','').encode('ascii', errors='ignore').decode('utf-8') for isbn
+                         in data_dict.get('isbn')]
         else:
             self.ISBN = None
         self.Languages = data_dict.get('language')
