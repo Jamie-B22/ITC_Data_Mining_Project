@@ -7,6 +7,8 @@ Authors: Jamie Bamforth and Jordan Ribbans
 import requests
 import bs4
 import logging
+import time
+import random
 from Scraper.scrape_error import ScrapeError
 from config import *
 
@@ -88,6 +90,7 @@ def list_scraper(list_url):
         logger.error(f"Returned no book IDs from list {list_url}, it is likely the list page and it's HTML have been "
                      f"updated")
         raise ScrapeError("Failed to scrape book IDs, it is likely the list page and it's HTML have been updated.")
+    time.sleep(ANTI_THROTTLE_DELAY_S + random.randint(0, 1))  # to avoid throttling, 9s wasn't enough
     return id_list
 
 
