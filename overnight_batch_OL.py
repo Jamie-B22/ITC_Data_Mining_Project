@@ -43,8 +43,7 @@ with connection.cursor() as cursor:
     query = "select name from authors;"
     cursor.execute(query)
     result = cursor.fetchall()
-    authors = list(result)
-    for author in authors:
+    for author in result:
         OL_API_update_by_author(author)
 
 
@@ -52,8 +51,7 @@ with connection.cursor() as cursor:
     query = "select title from editions;"
     cursor.execute(query)
     result = cursor.fetchall()
-    titles = list(result)
-    for title in titles:
+    for title in result:
         OL_API_update_by_title(title)
 
 
