@@ -44,7 +44,11 @@ with connection.cursor() as cursor:
     cursor.execute(query)
     result = cursor.fetchall()
     for author in result:
-        OL_API_update_by_author(author)
+        try:
+            OL_API_update_by_author(author)
+        except Exception as err:
+            logger.error(err)
+            print(author, type(author))
 
 
 with connection.cursor() as cursor:
