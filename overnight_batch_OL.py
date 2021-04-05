@@ -45,18 +45,22 @@ with connection.cursor() as cursor:
     result = cursor.fetchall()
     for author in result:
         try:
-            OL_API_update_by_author(author)
+            OL_API_update_by_author(author.get("name"))
         except Exception as err:
             logger.error(err)
-            print(author, type(author))
+            logger.error(f"Failed to search {author}")
 
 
 with connection.cursor() as cursor:
     query = "select title from editions;"
     cursor.execute(query)
     result = cursor.fetchall()
-    for title in result:
-        OL_API_update_by_title(title)
+    for book in result:
+        try:
+            OL_API_update_by_title(book.get("title"))
+        except Exception as err:
+            logger.error(err)
+            logger.error(f"Failed to search {book}")
 
 
 time_taken = round(time.time() - start_time, 2)
