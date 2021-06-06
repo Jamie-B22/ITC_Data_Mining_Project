@@ -1,7 +1,5 @@
 # ITC Data Mining Project
 
-###### Current status: This is an ongoing project. This readme currently details the progress made as of the third checkpoint where data is scraped into a MySQL database and can be enriched from the Open Library API and the NYT bestsellers lists API.
-
 ### Description
 
 This web scraper finds, scrapes and stores details of books from [Goodreads](https://www.goodreads.com/). It works by taking the user's selection of a goodreads list and scraping and storing the details of all books on that list. The data will be stored in a MySQL database (structure detailed below), or into a CSV file if it is unable to make a connection to the database.
