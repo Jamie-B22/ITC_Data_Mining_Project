@@ -75,6 +75,12 @@ The web scraper was created as a project as part of the Data Science Fellows Pro
 Details about the database structure can be found in the file: [data_dictionary](https://github.com/Jamie-B22/ITC_Data_Mining_Project/blob/master/Reference%20Material/data_dictionary.csv)
 
 ### Setup Instructions
+#### NYT API Setup:
+If the any of the enrichment by the NYT API is required, then please create an API key for the NYT API by creating an
+account [here](https://developer.nytimes.com/get-started) and requesting an API key. The key string should be inserted
+into the `config.py` script assigned to the variable `NYT_API_KEY` on line 22.
+
+
 #### Database Setup:
 1. A MySQL database is used to store the data and the database upload process in `SQL_uploader.py` in this project has a few components
    specific to MySQL, so for compatibility MySQL should be installed and used. Installation instructions can be found [here](https://www.mysqltutorial.org/install-mysql-ubuntu/)

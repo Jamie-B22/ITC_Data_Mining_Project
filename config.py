@@ -19,6 +19,6 @@ ROOT_BOOK_URL = "http://www.goodreads.com/book/show/"
 OL_BASE_URL = "https://openlibrary.org/search.json?"
 
 # For the NYT API
-NYT_API_KEY = 'gyAYYsc5MUxhVHVQD3AFDQznc084UhQp'
+NYT_API_KEY =  # Please insert your NYT API key here
 NYT_API_BASE_URL = 'https://api.nytimes.com/svc/books/v3/lists'
 NYT_API_END_URL = '.json?api-key='
