@@ -9,7 +9,6 @@ import datetime as dt
 import time
 import csv
 import logging
-import random
 
 logger = logging.getLogger('main')
 logger.setLevel(logging.DEBUG)
@@ -37,14 +36,13 @@ def scrape_books_from_list(book_id_list):
     """Take a list of Goodreads book IDs and scrape the data from the book webpages. Return a list of Book_Record
     objects that contain the scraped data."""
     book_data = []
-    for book_ID in book_id_list:
-        try:
+    try:
+        for book_ID in book_id_list:
             book_data_dict = book_scraper(book_ID)
             book_data.append(BookRecord(book_data_dict))
             # print(book_data[-1].__dict__)
-        except ConnectionError as err:
-            logger.error(f'Failure to scrape book. {err}')
-            time.sleep(ANTI_THROTTLE_DELAY_L + random.randint(0, 1))  # to avoid throttling
+    except ConnectionError as err:
+        logger.error(f'Failure to scrape book. {err}')
     return book_data
 
 
